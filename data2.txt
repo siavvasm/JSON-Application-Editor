@@ -1,0 +1,13 @@
+{
+    "App1": {
+                "Type":1,
+                "Name":"Name1"
+    
+    },
+    "App2": {
+                "Type":2,
+                "Name":"Name2"
+    
+    }
+    
+}
