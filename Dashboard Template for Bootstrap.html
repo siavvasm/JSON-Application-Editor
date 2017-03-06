@@ -59,10 +59,7 @@
                </ul>
             </div>
          </div>
-      </nav>
-       
-
-       
+      </nav>     
        
       <div class="container-fluid">
          <div class="row">
@@ -136,10 +133,11 @@
                 
                 if (obj != undefined){
                     // 1. Convert the data into a JSON String
-                    var json = JSON.stringify(obj);
+                    var json = JSON.stringify(obj, null, 2);
 
                     // 2. Write the string to the desired textfield
                     document.getElementById("export-field").value = json;
+                    document.getElementById("export-area").value = json;
                     
                 } else {
                     alert("Please define the applications through the GUI before selecting Export");
@@ -177,6 +175,11 @@
                 //alert("New Button is Pressed!!!")
                 document.getElementById("prop-table").setAttribute("style","display: none;");
                 document.getElementById("prop-edit").setAttribute("style","");
+                
+/*
+                $("#prop-table").slideUp(2000);
+                $("#prop-edit").slideDown(2000);
+*/
                 //delete obj["App2"];
                 //updateApplicationTable()
                 
@@ -246,6 +249,11 @@
                     // 1. Hide the Properties Table and present the form
                     document.getElementById("prop-table").setAttribute("style","display: none;");
                     document.getElementById("prop-edit").setAttribute("style","");
+                    
+/*
+                    //$("#prop-table").fadeOut(2000);
+                    //$("#prop-edit").fadeIn(2000);
+*/
                 
                     // 2. Add the info of the selected object to the fields of the form
                     var selObj = obj["App" + selected];
@@ -342,6 +350,7 @@
                         </tr>
                      </thead>
                      <tbody id="app-table">
+<!--
                         <tr>
                            <td>1</td>
                            <td>App1</td>
@@ -358,6 +367,7 @@
                            <td>4</td>
                            <td>App4</td>
                         </tr>
+-->
                      </tbody>
                   </table>
                <!-- /div -->      
@@ -382,6 +392,7 @@
                         </tr>
                      </thead>
                      <tbody id="prop-table">
+<!--
                         <tr>
                            <td>1</td>
                            <td>Bad_Function</td>
@@ -437,6 +448,7 @@
                            <td>Encapsulation</td>
                            <td>0.0</td>
                         </tr>
+-->
                      </tbody>
                   </table>
                </div>
@@ -509,6 +521,19 @@
                 <button id="export-button" class="btn btn-default" onclick="exportJSON()">Export Json</button>
                 <br><br>
                 <hr/>
+                
+                
+                <!-- TO BE REMOVED!!! -->
+                <textarea id="export-area" width="500px" height="200px"></textarea>
+                <button id="export-file-button" class="btn btn-default" onclick="exportJSONtoFile()">Export Json to File</button>
+                
+                <script>
+                    function exportJSONtoFile() {
+                        location.href = "data:application/octet-stream," + encodeURIComponent(JSON.stringify(obj, null, 2));
+                        console.log(location.href);
+                    }
+                
+                </script>
                 
             </div>
          </div>
