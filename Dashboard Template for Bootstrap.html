@@ -75,6 +75,7 @@
                 <br>
                 <button id="import-button" class="btn btn-default" onclick="importJSON()">Import</button>
                 <br><br>
+                
                 <hr/>
                 
                 
@@ -98,15 +99,15 @@
                     // 2. Define the details of the request
                     xhr.open("GET", fileName, true)
 
-
                     // 4.Define the handler
                     xhr.addEventListener("readystatechange", processRequest, true);
 
                     function processRequest(e) {
-
+                        
                      if (xhr.readyState == 4 && xhr.status == 200) {
+                         alert(fileName)
                          var response = JSON.parse(xhr.responseText);
-                        alert(response["App1"]["Name"]);
+                        alert(response["Applications"].length);
                         obj = response;
                          
                          // Update the table
@@ -150,18 +151,22 @@
                 var table = document.getElementById("app-table")
                 table.innerHTML = "";
                 
-                for (key in obj) {
+                var appArray = obj["Applications"];
+                
+                for (var i = 0, len = appArray.length; i < len; i++) {
                     
-                    alert(obj[key]["Name"])
+                    var application = appArray[i];
+                    
+                    alert(application["Application Name"])
                     
                     var tr = document.createElement("tr");
                     
                     var t1 = document.createElement("td");
-                    var c1 = document.createTextNode(obj[key]["Type"])
+                    var c1 = document.createTextNode(i + 1)
                     t1.appendChild(c1);
                     
                     var t2 = document.createElement("td");
-                    var c2 = document.createTextNode(obj[key]["Name"])
+                    var c2 = document.createTextNode(application["Application Name"])
                     t2.appendChild(c2);
                     
                     tr.appendChild(t1);
@@ -229,7 +234,8 @@
                     var answer = confirm("This entry will be permanently deleted! Proceed with the action?");
                     if (answer) {
                         console.log(selected);
-                        delete obj["App" + selected];
+                        //delete obj["Applications"][selected - 1];
+                        obj["Applications"].splice(selected - 1, 1);
 
                         selected = "";
                         updateApplicationTable();
@@ -281,7 +287,7 @@
                         x = this.getElementsByTagName("td");
                         console.log(x.length);
                         console.log(x[0].textContent);
-                        selected = x[0].textContent;
+                        selected = parseInt(x[0].textContent);
                         
                         updatePropertiesTable();
                         //console.log(selected);
@@ -299,7 +305,9 @@
                 var table = document.getElementById("prop-table");
                 table.innerHTML = "";
                 
-                selObj = obj["App" + selected];
+                var applications = obj["Applications"];
+                selObj = applications[selected - 1];
+                
                 //console.log("Obj: " + "App" + selected)
                 //console.log("Obj: " + selObj);
                 
@@ -476,39 +484,170 @@
                 <button id="delete-button" class="btn btn-default">Delete</button>
                 <button id="new-button" class="btn btn-default">New</button>
 -->
-       <div class="row" id="prop-edit" style="display: none;">
+       <div class="row" id="prop-edit" style="display: none;" align="center">
+        <!-- div class="col-xs-3 form-group"></div -->
         <div class="col-xs-6 form-group">
             <label>Application Name</label>
             <input class="form-control" class="form-control" placeholder="Application Name" style="text-align:center;" type="text" id="app-name"/>
-        </div>
+        </div> 
+           
         <div class="col-xs-6 form-group">
-            <label>Application Type</label>
-            <input class="form-control" type="text" id="app-type"/>
-        </div>
-        <div class="col-xs-6">
             <div class="row">
-                <label class="col-xs-12">VM Range</label>
+                <label class="col-xs-12">Instructions Per App</label>
             </div>
             <div class="row">
                 <div class="col-xs-12 col-sm-6">
-                    <input class="form-control" placeholder="min" style="text-align:center;" type="text"/>
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="ipa-min"/>
                 </div>
                 <div class="col-xs-12 col-sm-6">
-                    <input class="form-control" placeholder="max" style="text-align:center;" type="text"/>
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="ipa-max"/>
+                </div>
+            </div>
+        </div>         
+        
+        <div class="col-xs-6 form-group">
+            <label>Number of Implementations</label>
+            <input class="form-control" type="text" placeholder="Number of Implementations" style="text-align:center;" id="num-impl"/>
+        </div>
+    
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">VMs Per App</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="vpa-min"/>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="vpa-max"/>
                 </div>
             </div>
         </div>
+           
         <div class="col-xs-6 form-group">
-            <label>Label4</label>
-            <input class="form-control" type="text"/>
+            <label>Available Implementations</label>
+            <input class="form-control" type="text" id="app-type" placeholder="Available Implementations" style="text-align:center;" id="avail-impl"/>
         </div>
-        <br>
-        <div id="button-group-2" align="right">
-        <button id="add-button" class="btn btn-default" onclick="addButtonPressed()">Add</button>
-        <button id="cancel-button" class="btn btn-default" onclick="cancelButtonPressed()">Cancel</button>
+           
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">vCPUs Per VM</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="cpu-min"/>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="cpu-max"/>
+                </div>
+            </div>
+        </div>
+           
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">Memory Per VM</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="mpv-min"/>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="mpv-max"/>
+                </div>
+            </div>
+        </div>
+           
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">Storage Per VM</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="spv-min"/>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="spv-max"/>
+                </div>
+            </div>
+        </div>
+           
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">Network Per VM</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="npv-min"/>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="npv-max"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-6 form-group">
+            <label>Type of Actual Utilization (vCPU,Memory,Network)</label>
+            <input class="form-control" type="text" id="app-type" placeholder="Actual Utilization" style="text-align:center;" id="type-util"/>
+        </div>
+
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">Actual vCPU Utilization</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="acu-min"/>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="acu-max"/>
+                </div>
+            </div>
+        </div>
+           
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">Actual Memory Utilization</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="amu-min"/>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="amu-max"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">Actual Network Utilization</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="anu-min"/>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="anu-max"/>
+                </div>
+            </div>
+        </div>
+           
+        <div class="col-xs-6 form-group">
+            <label>Accelerator Support</label>
+            <input class="form-control" type="text" id="app-type" placeholder="Accelerator Support" style="text-align:center;" id="acc-sup"/>
+        </div>
+           
+        <div class="col-xs-6 form-group">
+            <label>Rho for accelerator execution per Implementation</label>
+            <input class="form-control" type="text" id="app-type"  placeholder="Rho" style="text-align:center;" id="rho-exec"/>
         </div>
     </div>
-   
+
+        <div id="button-group-2" align="right" id="prop-edit-buttons">
+            <button id="save-button" class="btn btn-default" onclick="saveButtonPressed()">Save</button>
+            <button id="add-button" class="btn btn-default" onclick="addButtonPressed()">Add</button>
+            <button id="cancel-button" class="btn btn-default" onclick="cancelButtonPressed()">Cancel</button>
+        </div>
        
                 <h2 class="sub-header" align="left">Export</h2>          
                <!-- Section 4 -->
