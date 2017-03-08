@@ -69,23 +69,141 @@
                <h1 class="page-header">Application JSON Generator</h1>
                <!--label style="font-family: Calibri; font-size:40px" >TQI</label-->
                 <br>
-                <label style="font-family: Calibri; font-size:20px"> Please provide the name of the JSON file you would like to parse its contnet: </label>
+                <label style="font-family: Calibri; font-size:20px"> Please provide the JSON string or the name of the JSON file that you would like to parse its contnet: </label>
                 <br><br>
-                 <input type="text" id="import-field" class="form-control"  placeholder= "JSON file name" width="100px" vspace="0" style="max-width:300px;margin:auto;margin-top:10px;text-align:center;">
+                 <input type="text" id="import-field" class="form-control"  placeholder= "JSON string or file name" width="100px" vspace="0" style="max-width:300px;margin:auto;margin-top:10px;text-align:center;">
+                
+                <!-- div id="radio-buttons">
+                    String: <input type="radio" name="input-type" value="String" id="string-radio" onclick="stringRadioButtonClicked()" checked>
+                    File: <input type="radio" name="input-type" value="File" id="file-radio" onclick="fileRadioButtonClicked()">
+                </div -->
+                
                 <br>
-                <button id="import-button" class="btn btn-default" onclick="importJSON()">Import</button>
+                <div id="button-group">
+                    <!-- button id="import-button" class="btn btn-default" onclick="importJSON()">Import</button -->
+                    <button id="parse-button" class="btn btn-default" onclick="parseJSON()">Parse</button>
+                    <button id="select-button" class="btn btn-default" onclick="document.getElementById('fileToLoad').click();">Import</button>
+                    <input type="file" id="fileToLoad" style="display:none;" onchange="importJSONFile()">
+                    <!-- button id="import-button" class="btn btn-default" onclick="importJSONFile()" style="display:none;">Import</button-->
+                    
+                </div>
+                    
                 <br><br>
                 
                 <hr/>
-                
-                
+                              
         <script>
             // Add event handlers ...
             
-            // Global variables ...
-            var obj = {}; 
+            // Initialize the global variables ...
+            var obj = {"Number of Applications":0, "Minimum and Maximum Jobs Per Second":[], "Applications":[]}; 
             var selected = 0;
+            var schemaStr = ```{"title":"Application set","Number of Applications":{"type":"number"},"Minimum and Maximum Jobs Per Second":{"type":"array"},"Applications":{"type":"array","items": {"title":"Application","type":"object","properties": {"ApplicationID": {"type": "number"},"Number of Available Implementations": {"type": "number"},"Available Implementations": {"type": "number"},"Minimum - Maximum Instructions Per App": {"type": "array"},"Minimum - Maximum VMs Per App":{"type":"array"},"Minimum - Maximum vCPUs Per VM":{"type":"array"},"Minimum - Maximum Memory Per VM": {"type": "array"},"Minimum - Maximum Storage Per VM": {"type": "array"},"Minimum - Maximum Network Per VM": {"type": "array"},"Type of Actual Utilization (vCPU,Memory,Network)": {"type": "array"},"Minimum - Maximum Actual vCPU Utilization": {"type": "array"},"Minimum - Maximum Actual Memory Utilization": {"type": "array"},"Minimum - Maximum Actual Network Utilization": {"type": "array"},"Accelerator support": {"type": "array"},"Rho for accelerator execution per Implementation": {"type": "array"}}}}}```
+
             
+            
+            /**
+             * This function is called when the Parse button is clicked.
+             */
+            function parseJSON() {
+                
+                // 1. Get the JSON string
+                var jsonInput = document.getElementById("import-field").value;
+                console.log("Parsing the provided string...");
+                
+                // 2. Parse the JSON string
+                // TODO: Validate against a schema ...
+                if (jsonInput.includes('{') && jsonInput.includes('}')) {
+                    
+                    // 3. Parse the content of the JSON string
+                    obj = JSON.parse(jsonInput);
+                    
+                    // 4. Update the tables ...
+                    // TODO: Remove
+                    updateApplicationTable();
+                    addTableRowHandler();
+                    
+                } else {
+                    alert("Please provide a valid json string before clicking the Parse button!");
+                }     
+            }
+            
+            /**
+             * This function is called when the Import button is clicked
+             * in order to import a JSON file.
+             */
+            function importJSONFile() {
+                
+                // 1. Import the file content as text
+                loadFileContent();
+                
+                // 3. Update the tables
+                updateApplicationTable();
+                         
+                addTableRowHandler();
+
+            }
+            
+
+            /**
+             * This function is called in order to parse the content of the 
+             * desired file that contains the JSON with the applications.
+             */
+            function loadFileContent(){
+                
+                  // 1. Get the name of the desired file and update the value of the Import field.
+                  var fileToLoad = document.getElementById("fileToLoad").files[0];
+                  document.getElementById("import-field").value = fileToLoad["name"];
+                
+                  // TODO: Remove!
+                  console.log(fileToLoad);
+                  alert(fileToLoad);
+
+                  // Create a new FileReader object.
+                  var fileReader = new FileReader();
+
+                  /**
+                   * Define what the FileReader object should do, when the desired file is loaded.
+                   */
+                  fileReader.onload = function(fileLoadedEvent){
+
+                      // 1. Load the String and print it to the console
+                      var textFromFileLoaded = fileLoadedEvent.target.result;
+                      console.log(textFromFileLoaded);
+
+                      // 2. Parse the JSON string into a JavaScript object
+                      obj  = JSON.parse(textFromFileLoaded);
+                      console.log(obj);
+                      
+                      // 3. Update everything 
+                      updateApplicationTable();
+                      addTableRowHandler();
+
+                      // TODO: Remove
+                      // 4. Convert the JSON object to String and print it to the console
+/*
+                      var backToString = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
+                      console.log(backToString);
+                      // Add it to the text area...
+                      document.getElementById("export-area").value = backToString;
+*/
+                  };
+
+                  fileReader.readAsText(fileToLoad, "UTF-8");
+            }
+            
+            /**
+             * Checks if the JSON file provided as input adheres to the desired schema.
+             */
+            function isJSONValid(json) {
+                console.log("Inside is valid...")
+                
+                // 1. Parse the schema:
+                var schema = JSON.parse(schemaStr);
+                console.log(schema);
+                
+            }
+/*
             // Import button pressed
             function importJSON() {
                 // 1. Create the gateway
@@ -128,16 +246,23 @@
 
                 
             }
-            
-            // Export button pressed...
+ */           
+            /**
+             * This function is called when the Export button pressed.
+             */
             function exportJSON() {
                 
                 if (obj != undefined){
+                    
+                    // 0. Define the overall values
+                    obj["Number of Applications"] = obj["Applications"].length;
+                    obj["Minimum and Maximum Jobs Per Second"] = [];
+                    
                     // 1. Convert the data into a JSON String
-                    var json = JSON.stringify(obj, null, 2);
+                    var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
 
                     // 2. Write the string to the desired textfield
-                    document.getElementById("export-field").value = json;
+                    document.getElementById("export-field").value = JSON.stringify(obj);
                     document.getElementById("export-area").value = json;
                     
                 } else {
@@ -146,18 +271,28 @@
 
             }
             
+            /**
+             * This function updates the Applications table based on the objects stored
+             * inside the Applications array of the desired JSON. In particular, it 
+             * creates one row for each Application object found in this JavaScript 
+             * array.
+             */
             function updateApplicationTable() {
                 
+                // 1. Clean the contents of the table
                 var table = document.getElementById("app-table")
                 table.innerHTML = "";
                 
+                // 2. Get the array that contains the application objects
                 var appArray = obj["Applications"];
                 
+                // 3. Create one row for each application object
                 for (var i = 0, len = appArray.length; i < len; i++) {
                     
                     var application = appArray[i];
                     
-                    alert(application["Application Name"])
+                    // TODO: Remove
+                    alert("App" + (i+1))
                     
                     var tr = document.createElement("tr");
                     
@@ -166,7 +301,7 @@
                     t1.appendChild(c1);
                     
                     var t2 = document.createElement("td");
-                    var c2 = document.createTextNode(application["Application Name"])
+                    var c2 = document.createTextNode("App" + (i + 1))
                     t2.appendChild(c2);
                     
                     tr.appendChild(t1);
@@ -175,147 +310,50 @@
                     table.appendChild(tr);
                 }
             }
-            
-            function newButtonPressed() {
-                //alert("New Button is Pressed!!!")
-                document.getElementById("prop-table").setAttribute("style","display: none;");
-                document.getElementById("prop-edit").setAttribute("style","");
-                
-/*
-                $("#prop-table").slideUp(2000);
-                $("#prop-edit").slideDown(2000);
-*/
-                //delete obj["App2"];
-                //updateApplicationTable()
-                
-                clearTextFields();
-            }
-            
-            function clearTextFields() {
-               document.getElementById("app-name").value = "";
-               document.getElementById("app-type").value = "";
-            }
-            
-            function cancelButtonPressed() {
-                //alert("Cancel Button is Pressed!!!")
-                document.getElementById("prop-edit").setAttribute("style","display: none;");
-                document.getElementById("prop-table").setAttribute("style","");
-            }
-            
-            function addButtonPressed() {
-                
-                var newApp = {};
-                
-                newApp["Type"] = document.getElementById("app-type").value;
-                newApp["Name"] = document.getElementById("app-name").value;
-                
-                length = 0;
-                for (var key in obj) {
-                    length++;
-                }
-                console.log("LENGTH: ", length);
-                
-                id = length + 1;
-                id = "App" + id;
-                
-                obj[id] = newApp;
-                
-                updateApplicationTable();
-                selected = id;
-                updatePropertiesTable();
-                addTableRowHandler();
-                
-                cancelButtonPressed();
-            }
-            
-            function deleteButtonPressed () {
-                if (selected != "") {
-                    
-                    var answer = confirm("This entry will be permanently deleted! Proceed with the action?");
-                    if (answer) {
-                        console.log(selected);
-                        //delete obj["Applications"][selected - 1];
-                        obj["Applications"].splice(selected - 1, 1);
-
-                        selected = "";
-                        updateApplicationTable();
-                        updatePropertiesTable();
-                        addTableRowHandler();
-                    }
-
-                    
-                } else {
-                    alert("Please select an application entry to delete!");
-                }
-            }
-            
-            function editButtonPressed() {
-                
-                if (selected != "") {
-                    // 1. Hide the Properties Table and present the form
-                    document.getElementById("prop-table").setAttribute("style","display: none;");
-                    document.getElementById("prop-edit").setAttribute("style","");
-                    
-/*
-                    //$("#prop-table").fadeOut(2000);
-                    //$("#prop-edit").fadeIn(2000);
-*/
-                
-                    // 2. Add the info of the selected object to the fields of the form
-                    var selObj = obj["App" + selected];
-                
-                    for (var key in selObj) {
-                        document.getElementById("app-name").value = selObj["Name"];
-                        document.getElementById("app-type").value = selObj["Type"];
-                    }     
-                } else {
-                    alert("Please select an application first!");
-                }
-            }
-            
-            /* Adds an "onclick" handler to the rows of the Application Table   */   
+                       
+            /* Adds an "onclick" handler to the rows of the Application Table */   
             function addTableRowHandler() {
                 
-                // 1. Get the table and the rows
+                // 1. Get the rows of the first html table
                 var table = document.getElementById("app-table");
                 var rows = table.getElementsByTagName("tr");
                 
                 // 2. Add the desired listener to the rows of the table
                 for (var i = 0, len = rows.length; i < len; i++) {
+                    
                     rows[i].onclick = function () {
-                        console.log(this.innerHTML);
+                        
                         x = this.getElementsByTagName("td");
+                        
+                        // TODO: Remove
+                        console.log(this.innerHTML);
                         console.log(x.length);
                         console.log(x[0].textContent);
-                        selected = parseInt(x[0].textContent);
                         
+                        selected = parseInt(x[0].textContent);  
                         updatePropertiesTable();
-                        //console.log(selected);
                     }
                 }
-            }
-            
+            }            
+                      
             /*
-             * This method is called when a row of the Application Table is * clicked. It is responsible for updating the Properties Table 
-             * with the details of the selected application.
-             *
+             * This function is responsible for updating the content of the Properties html table
+             * with the characteristics of the Application object that the "selected" global variable
+             * points to.              *
              */
             function updatePropertiesTable() {
                 
+                // 1. Clean the contents of the table
                 var table = document.getElementById("prop-table");
                 table.innerHTML = "";
                 
+                // 2. Get the selected application
                 var applications = obj["Applications"];
                 selObj = applications[selected - 1];
                 
-                //console.log("Obj: " + "App" + selected)
-                //console.log("Obj: " + selObj);
-                
-                var i = 1;
-                
+                // 3. Add one row for each key value found in the application object
+                var i = 1; 
                 for (key in selObj) {
-                    
-                    //alert(obj[key]["Name"])
                     
                     var tr = document.createElement("tr");
                     
@@ -341,7 +379,294 @@
                 }
             }
        
+            
+            function newButtonPressed() {
+                
+                // 0. Show the Add button
+                document.getElementById("save-button").style.display = "none";
+                document.getElementById("add-button").style.display = "";
+                
+                // 1. Hide the table and display the form
+                document.getElementById("prop-table").setAttribute("style","display: none;");
+                document.getElementById("prop-edit").setAttribute("style","");
+                
+                // 2. Clear all the text fields
+                clearTextFields();
+/*
+                $("#prop-table").slideUp(2000);
+                $("#prop-edit").slideDown(2000);
+*/
+            }
+            
+            function clearTextFields() {
+               document.getElementById("ipa-min").value = "";
+               document.getElementById("ipa-max").value = "";
+               document.getElementById("vpa-min").value = "";
+               document.getElementById("vpa-max").value = "";
+               document.getElementById("avail-impl").value = "";
+               document.getElementById("cpu-min").value = "";
+               document.getElementById("cpu-max").value = "";
+               document.getElementById("mpv-min").value = "";
+               document.getElementById("mpv-max").value = "";
+               document.getElementById("spv-min").value = "";
+               document.getElementById("spv-max").value = "";
+               document.getElementById("npv-min").value = "";
+               document.getElementById("npv-max").value = "";
+               document.getElementById("acu-min").value = "";
+               document.getElementById("acu-max").value = "";
+               document.getElementById("amu-min").value = "";
+               document.getElementById("amu-max").value = "";
+               document.getElementById("anu-min").value = "";
+               document.getElementById("anu-max").value = "";
+               document.getElementById("rho-exec").value = "";
+               document.getElementById("acc-sup").value = "";
+               document.getElementById("type-util").value = "";
+            
+            }
+            
+            function cancelButtonPressed() {
+                // Hide the New Application form and display the table with the selected application contents
+                document.getElementById("prop-edit").setAttribute("style","display: none;");
+                document.getElementById("prop-table").setAttribute("style","");
+            }
+            
+            function addButtonPressed() {
+                
+                // 1. Create an empty application
+                var newApp = {};
+                
+                // 2. Retrieve the key values from the text fields
+                newApp = createApplicationFromFields();
+          
+                // TODO: Remove
+                console.log(newApp["ApplicationID"]);
+                console.log(newApp["Number of Available Implementations"]);
+                console.log(newApp["Minimum - Maximum Instructions Per App"]);
+                console.log(newApp["Minimum - Maximum VMs Per App"]);
+                
+                // 3. Check if the values are valid and add it to the list
+                if (validNewApplication(newApp)) {
+                    
+                    // Add it to the list
+                    obj["Applications"][obj["Applications"].length] = newApp;
+                    
+                    // 1. Mark the new Application as the selected one
+                    selected = obj["Applications"].length;
+                    
+                    // 2. Update the Tables
+                    updateApplicationTable();
+                    updatePropertiesTable();
+                    addTableRowHandler();
+                    
+                    console.log(newApp)
+                    
+                    // 3. Display the table
+                    cancelButtonPressed();
+                } 
+
+            }
+            
+            /*
+             * Add any checks here.
+             */
+            function validNewApplication(newApp) {
+                
+                // 1. Assume that the inputs will be correct
+                valid = true;
+                errorMessage = "";
+                
+                // 2. Check the inputs
+                if (newApp["Accelerator support"].length != newApp["Available Implementations"].length) {
+                    valid = false;
+                    errorMessage += "1. The number of Accelerator support is not equal to the number of the defined implemenatations \n";
+                }
+                
+                if (newApp["Rho for accelerator execution per Implementation"].length != newApp["Available Implementations"].length) {
+                    valid = false;
+                    errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                }
+                
+                // 3. Check if there was an error
+                if (!valid) {
+                    alert(errorMessage);
+                }
+                
+                // 4. Return the outcome of the validation
+                return valid;
+                
+            }
+            
+            /*
+             * This function creates a new Application object from the values
+             * provided to the form's fields by the user.
+             */
+            function createApplicationFromFields() {
+                
+                // 1. Create an empty application
+                var newApp = {};
+                
+                // 2. Add the values from the fields
+                newApp["ApplicationID"] = obj["Applications"].length + 1;
+                
+                var availImpl = document.getElementById("avail-impl").value;
+                availImpl = availImpl.split(',');
+                for (var i = 0; i < availImpl.length; i++) {
+                    availImpl[i] = parseInt(availImpl[i]);
+                }
+                
+                newApp["Number of Available Implementations"] = availImpl.length;
+                newApp["Available Implementations"] = availImpl;
+                newApp["Minimum - Maximum Instructions Per App"] = [parseFloat(document.getElementById("ipa-min").value), parseFloat(document.getElementById("ipa-max").value)];
+                newApp["Minimum - Maximum VMs Per App"] = [parseInt(document.getElementById("vpa-min").value), parseInt(document.getElementById("vpa-max").value)];
+                newApp["Minimum - Maximum vCPUs Per VM"] = [parseInt(document.getElementById("cpu-min").value), parseInt(document.getElementById("cpu-max").value)];
+                newApp["Minimum - Maximum Memory Per VM"] = [parseInt(document.getElementById("mpv-min").value), parseInt(document.getElementById("mpv-max").value)];
+                newApp["Minimum - Maximum Storage Per VM"] = [parseFloat(document.getElementById("spv-min").value), parseFloat(document.getElementById("spv-max").value)];
+                newApp["Minimum - Maximum Network Per VM"] = [parseFloat(document.getElementById("npv-min").value), parseFloat(document.getElementById("npv-max").value)];
+                
+                var typeActUtil = document.getElementById("type-util").value;
+                typeActUtil = typeActUtil.split(',');
+                for (var i = 0; i < 3; i++) {
+                    typeActUtil[i] = parseInt(typeActUtil[i]);
+                }
+                
+                newApp["Type of Actual Utilization (vCPU,Memory,Network)"] = typeActUtil;
+                
+                newApp["Minimum - Maximum Actual vCPU Utilization"] = [parseFloat(document.getElementById("acu-min").value), parseFloat(document.getElementById("acu-max").value)];
+                newApp["Minimum - Maximum Actual Memory Utilization"] = [parseFloat(document.getElementById("amu-min").value), parseFloat(document.getElementById("amu-max").value)];
+                newApp["Minimum - Maximum Actual Network Utilization"] = [parseFloat(document.getElementById("anu-min").value), parseFloat(document.getElementById("anu-max").value)];
+                
+                var accSupport = document.getElementById("acc-sup").value;
+                accSupport = accSupport.split(',');
+                for (var i = 0; i < accSupport.length; i++) {
+                    accSupport[i] = parseInt(accSupport[i]);
+                }
+                newApp["Accelerator support"] = accSupport;
+                
+                var rho = document.getElementById("rho-exec").value;
+                rho = rho.split(',');
+                for (var i = 0; i < rho.length; i++) {
+                    rho[i] = parseFloat(rho[i]);
+                }
+                newApp["Rho for accelerator execution per Implementation"] = rho;
+                
+                // 3. Return the Application object
+                return newApp;
+            }
            
+            function deleteButtonPressed () {
+                
+                if (selected != 0) {
+                    
+                    var answer = confirm("This entry will be permanently deleted! Proceed with the action?");
+                    
+                    if (answer) {
+
+                        // 1. Remove the application object from the array
+                        obj["Applications"].splice(selected - 1, 1);
+                        
+                        // 2. Update the IDs of the remaining applications
+                        for (var i = 0, len = obj["Applications"].length; i < len; i++) {
+                            obj["Applications"][i]["ApplicationID"] = i + 1;
+                        }
+                        
+                        // 3. Diselect the applications
+                        selected = 0;
+                        
+                        // 4. Update the tables
+                        updateApplicationTable();
+                        updatePropertiesTable();
+                        addTableRowHandler();
+                    }
+    
+                } else {
+                    alert("Please select an application entry to delete!");
+                }
+            }
+            
+            /* 
+             * It displays the form with the fields completed with the values of
+             * the selected application.
+             */
+            function editButtonPressed() {
+                
+                if (selected != 0) {
+                
+                    // 0. Show the Save button
+                    document.getElementById("save-button").style.display = "";
+                    document.getElementById("add-button").style.display = "none";
+                    
+                    // 1. Hide the Properties Table and present the form
+                    document.getElementById("prop-table").setAttribute("style","display: none;");
+                    document.getElementById("prop-edit").setAttribute("style","");
+                    
+/*
+                    //$("#prop-table").fadeOut(2000);
+                    //$("#prop-edit").fadeIn(2000);
+*/
+                
+                    // 2. Add the info of the selected object to the fields of the form
+                    var selObj = obj["Applications"][selected - 1];
+                    
+                    document.getElementById("ipa-min").value = selObj["Minimum - Maximum Instructions Per App"][0];
+                    document.getElementById("ipa-max").value = selObj["Minimum - Maximum Instructions Per App"][1];
+                    document.getElementById("vpa-min").value = selObj["Minimum - Maximum VMs Per App"][0];
+                    document.getElementById("vpa-max").value = selObj["Minimum - Maximum VMs Per App"][1];
+                    document.getElementById("avail-impl").value = selObj["Available Implementations"].join(',');
+                    document.getElementById("cpu-min").value = selObj["Minimum - Maximum vCPUs Per VM"][0];
+                    document.getElementById("cpu-max").value = selObj["Minimum - Maximum vCPUs Per VM"][1];
+                    document.getElementById("mpv-min").value = selObj["Minimum - Maximum Memory Per VM"][0];
+                    document.getElementById("mpv-max").value = selObj["Minimum - Maximum Memory Per VM"][1];
+                    document.getElementById("spv-min").value = selObj["Minimum - Maximum Storage Per VM"][0];
+                    document.getElementById("spv-max").value = selObj["Minimum - Maximum Storage Per VM"][1];
+                    document.getElementById("npv-min").value = selObj["Minimum - Maximum Network Per VM"][0];
+                    document.getElementById("npv-max").value = selObj["Minimum - Maximum Network Per VM"][1];
+                    document.getElementById("acu-min").value = selObj["Minimum - Maximum Actual vCPU Utilization"][0];
+                    document.getElementById("acu-max").value = selObj["Minimum - Maximum Actual vCPU Utilization"][1];
+                    document.getElementById("amu-min").value = selObj["Minimum - Maximum Actual Memory Utilization"][0];
+                    document.getElementById("amu-max").value = selObj["Minimum - Maximum Actual Memory Utilization"][1];
+                    document.getElementById("anu-min").value = selObj["Minimum - Maximum Actual Network Utilization"][0];
+                    document.getElementById("anu-max").value = selObj["Minimum - Maximum Actual Network Utilization"][1];
+                    document.getElementById("rho-exec").value = selObj["Rho for accelerator execution per Implementation"];
+                    document.getElementById("acc-sup").value = selObj["Accelerator support"].join(',');
+                    document.getElementById("type-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"].join(',');
+   
+                } else {
+                    alert("Please select an application first!");
+                }
+            }
+            
+            function saveButtonPressed() {
+
+                // 1. Create a new Application object
+                var newApp = {}
+                
+                // 2. Retrieve the values from the fields
+                newApp = createApplicationFromFields();
+                newApp["ApplicationID"] = obj["Applications"][selected - 1]["ApplicationID"];
+                
+                // 3. Check if it is valid and update the selected application
+                if (validNewApplication(newApp)) {
+                    
+                    // Update the selected object
+                    obj["Applications"][selected - 1] = newApp;
+                    
+                    // Update the Tables
+                    updateApplicationTable();
+                    updatePropertiesTable();
+                    addTableRowHandler();
+                    
+                    console.log(newApp)
+                    // Display the table
+                    cancelButtonPressed();
+            }
+        }
+            
+            function exportJSONtoFile() {
+                var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
+                location.href = "data:application/octet-stream," + encodeURIComponent(json);
+                console.log(location.href);
+            }
+            
        </script>
                 
                 
@@ -349,7 +674,7 @@
                 <!-- div class="col-md-3 " -->
                <h2 class="sub-header" align="left">Applications</h2>
             
-               <div class="table-responsive">
+               <div class="table-responsive" >
                   <table class="table table-striped">
                      <thead>
                         <tr>
@@ -358,24 +683,7 @@
                         </tr>
                      </thead>
                      <tbody id="app-table">
-<!--
-                        <tr>
-                           <td>1</td>
-                           <td>App1</td>
-                        </tr>
-                        <tr>
-                           <td>2</td>
-                           <td>App2</td>
-                        </tr>
-                        <tr>
-                           <td>3</td>
-                           <td>App3</td>
-                        </tr>
-                        <tr>
-                           <td>4</td>
-                           <td>App4</td>
-                        </tr>
--->
+                         
                      </tbody>
                   </table>
                <!-- /div -->      
@@ -392,6 +700,13 @@
 
                <div class="table-responsive">
                   <table class="table table-striped">
+                  <!--
+                    <col width="5px" />
+                    <col width="30px" />
+                    <col width="30px" />
+                    style="table-layout:fixed;"
+                    table.fixed td { overflow: hidden; }
+                    -->
                      <thead>
                         <tr>
                            <th>#</th>
@@ -400,96 +715,21 @@
                         </tr>
                      </thead>
                      <tbody id="prop-table">
-<!--
-                        <tr>
-                           <td>1</td>
-                           <td>Bad_Function</td>
-                           <td>0.0</td>
-                        </tr>
-                        <tr>
-                           <td>2</td>
-                           <td>Comprehensibility</td>
-                           <td>0.2222222222</td>
-                        </tr>
-                        <tr>
-                           <td>3</td>
-                           <td>Redundancy</td>
-                           <td>0.0</td>
-                        </tr>
-                        <tr>
-                           <td>4</td>
-                           <td>Structurdness</td>
-                           <td>0.0</td>
-                        </tr>
-                        <tr>
-                           <td>5</td>
-                           <td>Assignment</td>
-                           <td>0.1111111111</td>
-                        </tr>
-                        <tr>
-                           <td>6</td>
-                           <td>Resource_Handling</td>
-                           <td>0.1111111111</td>
-                        </tr>
-                        <tr>
-                           <td>7</td>
-                           <td>Cohesion</td>
-                           <td>1.0</td>
-                        </tr>
-                        <tr>
-                           <td>8</td>
-                           <td>Coupling</td>
-                           <td>0.0</td>
-                        </tr>
-                        <tr>
-                           <td>9</td>
-                           <td>Complexity</td>
-                           <td>2.0</td>
-                        </tr>
-                        <tr>
-                           <td>10</td>
-                           <td>Messaging</td>
-                           <td>2.0</td>
-                        </tr>
-                        <tr>
-                           <td>11</td>
-                           <td>Encapsulation</td>
-                           <td>0.0</td>
-                        </tr>
--->
+
                      </tbody>
                   </table>
                </div>
-<!--                
-                <div class="col-md-1 ">
-                    <label>Application:</label>
-                    <label>Name:</label>
-                    <label>Name:</label>
-                    <label>Name:</label>
-                    <label>Name:</label>
-                    <label>Name:</label>
-                </div>
-                
-                <div class="col-md-1 ">
 
-                    <input type="text" id="import-field" class="input"  placeholder= "JSON file name" width="100px" vspace="0" style="max-width:300px;text-align:center;">
-                    <input type="text" id="import-field" class="input"  placeholder= "JSON file name" width="100px" vspace="0" style="max-width:300px;text-align:center;">
-                    <input type="text" id="import-field" class="input"  placeholder= "JSON file name" width="100px" vspace="0" style="max-width:300px;text-align:center;">
-                    <input type="text" id="import-field" class="input"  placeholder= "JSON file name" width="100px" vspace="0" style="max-width:300px;text-align:center;">
-                    <input type="text" id="import-field" class="input"  placeholder= "JSON file name" width="100px" vspace="0" style="max-width:300px;text-align:center;">
-                    <input type="text" id="import-field" class="input"  placeholder= "JSON file name" width="100px" vspace="0" style="max-width:300px;text-align:center;">
-                </div>
-                
-                <button id="edit-button" class="btn btn-default">Edit</button>
-                <button id="delete-button" class="btn btn-default">Delete</button>
-                <button id="new-button" class="btn btn-default">New</button>
--->
        <div class="row" id="prop-edit" style="display: none;" align="center">
         <!-- div class="col-xs-3 form-group"></div -->
-        <div class="col-xs-6 form-group">
+        <!-- div class="col-xs-6 form-group">
             <label>Application Name</label>
             <input class="form-control" class="form-control" placeholder="Application Name" style="text-align:center;" type="text" id="app-name"/>
-        </div> 
+        </div --> 
+        <div class="col-xs-6 form-group">
+            <label>Available Implementations</label>
+            <input class="form-control" type="text" placeholder="Available Implementations" style="text-align:center;" id="avail-impl"/>
+        </div>
            
         <div class="col-xs-6 form-group">
             <div class="row">
@@ -505,10 +745,10 @@
             </div>
         </div>         
         
-        <div class="col-xs-6 form-group">
+        <!-- div class="col-xs-6 form-group">
             <label>Number of Implementations</label>
             <input class="form-control" type="text" placeholder="Number of Implementations" style="text-align:center;" id="num-impl"/>
-        </div>
+        </div -->
     
         <div class="col-xs-6 form-group">
             <div class="row">
@@ -523,11 +763,7 @@
                 </div>
             </div>
         </div>
-           
-        <div class="col-xs-6 form-group">
-            <label>Available Implementations</label>
-            <input class="form-control" type="text" id="app-type" placeholder="Available Implementations" style="text-align:center;" id="avail-impl"/>
-        </div>
+        
            
         <div class="col-xs-6 form-group">
             <div class="row">
@@ -587,7 +823,7 @@
 
         <div class="col-xs-6 form-group">
             <label>Type of Actual Utilization (vCPU,Memory,Network)</label>
-            <input class="form-control" type="text" id="app-type" placeholder="Actual Utilization" style="text-align:center;" id="type-util"/>
+            <input class="form-control" type="text" placeholder="Actual Utilization" style="text-align:center;" id="type-util"/>
         </div>
 
         <div class="col-xs-6 form-group">
@@ -634,12 +870,12 @@
            
         <div class="col-xs-6 form-group">
             <label>Accelerator Support</label>
-            <input class="form-control" type="text" id="app-type" placeholder="Accelerator Support" style="text-align:center;" id="acc-sup"/>
+            <input class="form-control" type="text" placeholder="Accelerator Support" style="text-align:center;" id="acc-sup"/>
         </div>
            
         <div class="col-xs-6 form-group">
             <label>Rho for accelerator execution per Implementation</label>
-            <input class="form-control" type="text" id="app-type"  placeholder="Rho" style="text-align:center;" id="rho-exec"/>
+            <input class="form-control" type="text" placeholder="Rho" style="text-align:center;" id="rho-exec"/>
         </div>
     </div>
 
@@ -663,16 +899,9 @@
                 
                 
                 <!-- TO BE REMOVED!!! -->
-                <textarea id="export-area" width="500px" height="200px"></textarea>
+                <textarea id="export-area" rows="20" cols="100"></textarea>
+                
                 <button id="export-file-button" class="btn btn-default" onclick="exportJSONtoFile()">Export Json to File</button>
-                
-                <script>
-                    function exportJSONtoFile() {
-                        location.href = "data:application/octet-stream," + encodeURIComponent(JSON.stringify(obj, null, 2));
-                        console.log(location.href);
-                    }
-                
-                </script>
                 
             </div>
          </div>
@@ -689,6 +918,12 @@
             <div><iframe name="fb_xdm_frame_http" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" id="fb_xdm_frame_http" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" src="./Dashboard Template for Bootstrap_files/ao6eUeuGXQq.html" style="border: none;"></iframe><iframe name="fb_xdm_frame_https" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" id="fb_xdm_frame_https" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" src="./Dashboard Template for Bootstrap_files/ao6eUeuGXQq(1).html" style="border: none;"></iframe></div>
          </div>
       </div>
+       
+       <script type="text/javascript" src="/lib/helpers.js"></script> 
+       <script type="text/javascript" src="/lib/index.js"></script> 
+       <script type="text/javascript" src="/lib/attribute.js"></script> 
+      <script type="text/javascript" src="/lib/validator.js"></script> 
+      <script type="text/javascript" src="neatjson.js"></script> 
       <script>(function(d, s, id) {var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) return;js = d.createElement(s); js.id = id;js.src = "//connect.facebook.net/ko_KR/sdk.js#xfbml=1&version=v2.7";fjs.parentNode.insertBefore(js, fjs);}(document, 'script', 'facebook-jssdk'));</script>
       <iframe id="rufous-sandbox" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" style="position: absolute; visibility: hidden; display: none; width: 0px; height: 0px; padding: 0px; border: none;" title="Twitter analytics iframe" src="./Dashboard Template for Bootstrap_files/saved_resource.html"></iframe>
    </body>
