@@ -255,8 +255,9 @@
                 if (obj != undefined){
                     
                     // 0. Define the overall values
-                    obj["Number of Applications"] = obj["Applications"].length;
                     obj["Minimum and Maximum Jobs Per Second"] = [];
+                    obj["Number of Applications"] = obj["Applications"].length;
+ 
                     
                     // 1. Convert the data into a JSON String
                     var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
@@ -343,6 +344,9 @@
              */
             function updatePropertiesTable() {
                 
+                // 0. Hide the buttons
+                document.getElementById("button-group-2").style.display = "none";
+                
                 // 1. Clean the contents of the table
                 var table = document.getElementById("prop-table");
                 table.innerHTML = "";
@@ -383,11 +387,12 @@
             function newButtonPressed() {
                 
                 // 0. Show the Add button
+                document.getElementById("button-group-2").style.display = "";
                 document.getElementById("save-button").style.display = "none";
                 document.getElementById("add-button").style.display = "";
                 
                 // 1. Hide the table and display the form
-                document.getElementById("prop-table").setAttribute("style","display: none;");
+                document.getElementById("prop-table-full").setAttribute("style","display: none;");
                 document.getElementById("prop-edit").setAttribute("style","");
                 
                 // 2. Clear all the text fields
@@ -421,13 +426,16 @@
                document.getElementById("rho-exec").value = "";
                document.getElementById("acc-sup").value = "";
                document.getElementById("type-util").value = "";
-            
+                
             }
             
             function cancelButtonPressed() {
-                // Hide the New Application form and display the table with the selected application contents
+                // 0. Hide the buttons
+                document.getElementById("button-group-2").style.display = "none";
+                
+                // 1. Hide the New Application form and display the table with the selected application contents
                 document.getElementById("prop-edit").setAttribute("style","display: none;");
-                document.getElementById("prop-table").setAttribute("style","");
+                document.getElementById("prop-table-full").setAttribute("style","");
             }
             
             function addButtonPressed() {
@@ -476,14 +484,86 @@
                 errorMessage = "";
                 
                 // 2. Check the inputs
+                i = 1;
                 if (newApp["Accelerator support"].length != newApp["Available Implementations"].length) {
                     valid = false;
-                    errorMessage += "1. The number of Accelerator support is not equal to the number of the defined implemenatations \n";
+                    //errorMessage += "1. The number of Accelerator support is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". Provide " + newApp["Available Implementations"].length + " elements at the Accelerator Support text field. \n";
+                    i++;
                 }
                 
                 if (newApp["Rho for accelerator execution per Implementation"].length != newApp["Available Implementations"].length) {
                     valid = false;
-                    errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". Provide " + newApp["Available Implementations"].length + " elements at the Rho for accelerator execution per Implementation text field. \n";
+                    i++;
+                }
+                
+                if (newApp["Type of Actual Utilization (vCPU,Memory,Network)"].length != 3) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". Provide 3 elements at the Type of Actual Utilization (vCPU,Memory,Network) text field. \n";
+                    i++;
+                }
+                
+                if (newApp["Minimum - Maximum Instructions Per App"][0] > newApp["Minimum - Maximum Instructions Per App"][1]) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". The minimum instructions per app that you defined are larger than the maximum. \n";
+                    i++;
+                }
+                
+                if (newApp["Minimum - Maximum VMs Per App"][0] > newApp["Minimum - Maximum VMs Per App"][1]) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". The minimum VMs per app that you defined are larger than the maximum. \n";
+                    i++;
+                }
+                if (newApp["Minimum - Maximum vCPUs Per VM"][0] > newApp["Minimum - Maximum vCPUs Per VM"][1]) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". The minimum vCPUs per VM that you defined are larger than the maximum. \n";
+                    i++;
+                }
+                if (newApp["Minimum - Maximum Memory Per VM"][0] > newApp["Minimum - Maximum Memory Per VM"][1]) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". The minimum memory per VM that you defined is larger than the maximum. \n";
+                    i++;
+                }
+                if (newApp["Minimum - Maximum Storage Per VM"][0] > newApp["Minimum - Maximum Storage Per VM"][1]) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". The minimum storage per VM that you defined is larger than the maximum. \n";
+                    i++;
+                }
+                
+                if (newApp["Minimum - Maximum Network Per VM"][0] > newApp["Minimum - Maximum Network Per VM"][1]) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". The minimum network per VM that you defined is larger than the maximum. \n";
+                    i++;
+                }
+                
+                if (newApp["Minimum - Maximum Actual vCPU Utilization"][0] > newApp["Minimum - Maximum Actual vCPU Utilization"][1]) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". The minimum vCPU utilization that you defined is larger than the maximum. \n";
+                    i++;
+                }
+                
+                if (newApp["Minimum - Maximum Actual Memory Utilization"][0] > newApp["Minimum - Maximum Actual Memory Utilization"][1]) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". The minimum actual memory utilization that you defined is larger than the maximum. \n";
+                    i++;
+                }
+                
+                if (newApp["Minimum - Maximum Actual Network Utilization"][0] > newApp["Minimum - Maximum Actual Network Utilization"][1]) {
+                    valid = false;
+                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
+                    errorMessage += i + ". The minimum actual network utilization that you defined is larger than the maximum. \n";
+                    i++;
                 }
                 
                 // 3. Check if there was an error
@@ -592,11 +672,12 @@
                 if (selected != 0) {
                 
                     // 0. Show the Save button
+                    document.getElementById("button-group-2").style.display = "";
                     document.getElementById("save-button").style.display = "";
                     document.getElementById("add-button").style.display = "none";
                     
                     // 1. Hide the Properties Table and present the form
-                    document.getElementById("prop-table").setAttribute("style","display: none;");
+                    document.getElementById("prop-table-full").setAttribute("style","display: none;");
                     document.getElementById("prop-edit").setAttribute("style","");
                     
 /*
@@ -699,7 +780,7 @@
                <h2 class="sub-header" align="left">Properties</h2>
 
                <div class="table-responsive">
-                  <table class="table table-striped">
+                  <table class="table table-striped" id="prop-table-full">
                   <!--
                     <col width="5px" />
                     <col width="30px" />
@@ -879,7 +960,7 @@
         </div>
     </div>
 
-        <div id="button-group-2" align="right" id="prop-edit-buttons">
+        <div id="button-group-2" align="right" id="prop-edit-buttons" style="display:none">
             <button id="save-button" class="btn btn-default" onclick="saveButtonPressed()">Save</button>
             <button id="add-button" class="btn btn-default" onclick="addButtonPressed()">Add</button>
             <button id="cancel-button" class="btn btn-default" onclick="cancelButtonPressed()">Cancel</button>
