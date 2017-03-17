@@ -157,7 +157,7 @@
                 
                   // TODO: Remove!
                   console.log(fileToLoad);
-                  alert(fileToLoad);
+                  //alert(fileToLoad);
 
                   // Create a new FileReader object.
                   var fileReader = new FileReader();
@@ -293,7 +293,7 @@
                     var application = appArray[i];
                     
                     // TODO: Remove
-                    alert("App" + (i+1))
+                    //alert("App" + (i+1))
                     
                     var tr = document.createElement("tr");
                     
@@ -404,6 +404,7 @@
             }
             
             function clearTextFields() {
+               // TODO: Use getElementsByTagName("input") to get all the text fields, iterate through them and set their value attribute to "".
                document.getElementById("ipa-min").value = "";
                document.getElementById("ipa-max").value = "";
                document.getElementById("vpa-min").value = "";
@@ -976,15 +977,14 @@
                  <input type="text" id="export-field" class="form-control"  placeholder= "JSON String Output" width="500px" vspace="0" style="max-width:500px;margin:auto;margin-top:10px;text-align:center;">
                 <br>
                 <button id="export-button" class="btn btn-default" onclick="exportJSON()">Export Json</button>
+                <button id="export-file-button" class="btn btn-default" onclick="exportJSONtoFile()">Export Json to File</button>
                 <br><br>
                 <hr/>
                 
                 
                 <!-- TO BE REMOVED!!! -->
                 <textarea id="export-area" rows="20" cols="100"></textarea>
-                
-                <button id="export-file-button" class="btn btn-default" onclick="exportJSONtoFile()">Export Json to File</button>
-                
+                 
             </div>
          </div>
       </div>
