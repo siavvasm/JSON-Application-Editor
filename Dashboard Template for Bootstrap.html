@@ -93,33 +93,31 @@
                 <hr/>
                               
         <script>
-            // Add event handlers ...
             
-            // Initialize the global variables ...
+            // Initialize the global variables
             var obj = {"Number of Applications":0, "Minimum and Maximum Jobs Per Second":[], "Applications":[]}; 
             var selected = 0;
+            
             var schemaStr = ```{"title":"Application set","Number of Applications":{"type":"number"},"Minimum and Maximum Jobs Per Second":{"type":"array"},"Applications":{"type":"array","items": {"title":"Application","type":"object","properties": {"ApplicationID": {"type": "number"},"Number of Available Implementations": {"type": "number"},"Available Implementations": {"type": "number"},"Minimum - Maximum Instructions Per App": {"type": "array"},"Minimum - Maximum VMs Per App":{"type":"array"},"Minimum - Maximum vCPUs Per VM":{"type":"array"},"Minimum - Maximum Memory Per VM": {"type": "array"},"Minimum - Maximum Storage Per VM": {"type": "array"},"Minimum - Maximum Network Per VM": {"type": "array"},"Type of Actual Utilization (vCPU,Memory,Network)": {"type": "array"},"Minimum - Maximum Actual vCPU Utilization": {"type": "array"},"Minimum - Maximum Actual Memory Utilization": {"type": "array"},"Minimum - Maximum Actual Network Utilization": {"type": "array"},"Accelerator support": {"type": "array"},"Rho for accelerator execution per Implementation": {"type": "array"}}}}}```
 
             
             
             /**
-             * This function is called when the Parse button is clicked.
+             * This function is called when the Parse button is clicked, and
+             * is responsible for parsing a given JSON string.
              */
             function parseJSON() {
                 
                 // 1. Get the JSON string
                 var jsonInput = document.getElementById("import-field").value;
-                console.log("Parsing the provided string...");
                 
-                // 2. Parse the JSON string
                 // TODO: Validate against a schema ...
                 if (jsonInput.includes('{') && jsonInput.includes('}')) {
                     
-                    // 3. Parse the content of the JSON string
+                    // 2. Parse the content of the JSON string
                     obj = JSON.parse(jsonInput);
                     
-                    // 4. Update the tables ...
-                    // TODO: Remove
+                    // 3. Update the tables 
                     updateApplicationTable();
                     addTableRowHandler();
                     
@@ -129,35 +127,31 @@
             }
             
             /**
-             * This function is called when the Import button is clicked
-             * in order to import a JSON file.
+             * This function is called when the Import button is clicked, and
+             * in responsile for import a file that contains the deired JSON 
+             * string.
              */
             function importJSONFile() {
                 
-                // 1. Import the file content as text
+                // Import the file content as text
                 loadFileContent();
                 
-                // 3. Update the tables
-                updateApplicationTable();
-                         
+                // Update the tables
+                updateApplicationTable();   
                 addTableRowHandler();
 
             }
             
 
             /**
-             * This function is called in order to parse the content of the 
-             * desired file that contains the JSON with the applications.
+             * This function is responsible for parsing the content of the 
+             * file that contains the desired JSON.
              */
             function loadFileContent(){
                 
                   // 1. Get the name of the desired file and update the value of the Import field.
                   var fileToLoad = document.getElementById("fileToLoad").files[0];
                   document.getElementById("import-field").value = fileToLoad["name"];
-                
-                  // TODO: Remove!
-                  console.log(fileToLoad);
-                  //alert(fileToLoad);
 
                   // Create a new FileReader object.
                   var fileReader = new FileReader();
@@ -178,17 +172,10 @@
                       // 3. Update everything 
                       updateApplicationTable();
                       addTableRowHandler();
-
-                      // TODO: Remove
-                      // 4. Convert the JSON object to String and print it to the console
-/*
-                      var backToString = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
-                      console.log(backToString);
-                      // Add it to the text area...
-                      document.getElementById("export-area").value = backToString;
-*/
+                      
                   };
-
+                  
+                  // Read the content of the file
                   fileReader.readAsText(fileToLoad, "UTF-8");
             }
             
@@ -203,52 +190,10 @@
                 console.log(schema);
                 
             }
-/*
-            // Import button pressed
-            function importJSON() {
-                // 1. Create the gateway
-                var xhr = new XMLHttpRequest();
-                
-                var fileName = document.getElementById("import-field").value;
-                
-                if (fileName != ""){
-                    alert(fileName)
-                    
-                    // 2. Define the details of the request
-                    xhr.open("GET", fileName, true)
 
-                    // 4.Define the handler
-                    xhr.addEventListener("readystatechange", processRequest, true);
-
-                    function processRequest(e) {
-                        
-                     if (xhr.readyState == 4 && xhr.status == 200) {
-                         alert(fileName)
-                         var response = JSON.parse(xhr.responseText);
-                        alert(response["Applications"].length);
-                        obj = response;
-                         
-                         // Update the table
-                         updateApplicationTable();
-                         
-                         addTableRowHandler();
-
-    
-                     }
-                }
-
-                // 3. Send the request
-                xhr.send()
-                     
-                } else {
-                    alert("Please provide a valid file!")               
-                }
-
-                
-            }
- */           
             /**
-             * This function is called when the Export button pressed.
+             * This function is called when the Export button pressed, in order
+             * to export the final list of applications as a JSON String.
              */
             function exportJSON() {
                 
@@ -257,7 +202,6 @@
                     // 0. Define the overall values
                     obj["Minimum and Maximum Jobs Per Second"] = [];
                     obj["Number of Applications"] = obj["Applications"].length;
- 
                     
                     // 1. Convert the data into a JSON String
                     var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
@@ -292,9 +236,6 @@
                     
                     var application = appArray[i];
                     
-                    // TODO: Remove
-                    //alert("App" + (i+1))
-                    
                     var tr = document.createElement("tr");
                     
                     var t1 = document.createElement("td");
@@ -312,7 +253,12 @@
                 }
             }
                        
-            /* Adds an "onclick" handler to the rows of the Application Table */   
+            /**
+             * This function adds an "onclick" handler to the rows of the Application Table.
+             * Whenever an Application entry is clicked the "selected" variable is updated in
+             * order to point to the selected application entry, and the Properties table is
+             * updated in order to show its details.
+             */   
             function addTableRowHandler() {
                 
                 // 1. Get the rows of the first html table
@@ -325,12 +271,6 @@
                     rows[i].onclick = function () {
                         
                         x = this.getElementsByTagName("td");
-                        
-                        // TODO: Remove
-                        console.log(this.innerHTML);
-                        console.log(x.length);
-                        console.log(x[0].textContent);
-                        
                         selected = parseInt(x[0].textContent);  
                         updatePropertiesTable();
                     }
@@ -339,8 +279,8 @@
                       
             /*
              * This function is responsible for updating the content of the Properties html table
-             * with the characteristics of the Application object that the "selected" global variable
-             * points to.              *
+             * with the details of the Application object that the "selected" global variable
+             * points to.         
              */
             function updatePropertiesTable() {
                 
@@ -383,7 +323,10 @@
                 }
             }
        
-            
+            /**
+             * This function is responsible for displaying an empty New/Edit Application
+             * form.
+             */
             function newButtonPressed() {
                 
                 // 0. Show the Add button
@@ -403,42 +346,45 @@
 */
             }
             
+            /**
+             * This function is responsible for clearing the fields 
+             * of the New/Edit Application form.
+             */
             function clearTextFields() {
-               // TODO: Use getElementsByTagName("input") to get all the text fields, iterate through them and set their value attribute to "".
-               document.getElementById("ipa-min").value = "";
-               document.getElementById("ipa-max").value = "";
-               document.getElementById("vpa-min").value = "";
-               document.getElementById("vpa-max").value = "";
-               document.getElementById("avail-impl").value = "";
-               document.getElementById("cpu-min").value = "";
-               document.getElementById("cpu-max").value = "";
-               document.getElementById("mpv-min").value = "";
-               document.getElementById("mpv-max").value = "";
-               document.getElementById("spv-min").value = "";
-               document.getElementById("spv-max").value = "";
-               document.getElementById("npv-min").value = "";
-               document.getElementById("npv-max").value = "";
-               document.getElementById("acu-min").value = "";
-               document.getElementById("acu-max").value = "";
-               document.getElementById("amu-min").value = "";
-               document.getElementById("amu-max").value = "";
-               document.getElementById("anu-min").value = "";
-               document.getElementById("anu-max").value = "";
-               document.getElementById("rho-exec").value = "";
-               document.getElementById("acc-sup").value = "";
-               document.getElementById("type-util").value = "";
+                
+               // Retrieve all the input fields of the Application Form
+               var appForm = document.getElementById("prop-edit");
+               var fields = appForm.getElementsByTagName("input");
+                
+               // Clear all the fields
+               for (i = 0, length = fields.length; i < length; i++) {
+                   fields[i].value = "";
+               }
                 
             }
             
+            /**
+             * This fucntion is called when the Cancel button is pressed
+             * in order to present the table with the details of the 
+             * Application entries.
+             */
             function cancelButtonPressed() {
+                
                 // 0. Hide the buttons
                 document.getElementById("button-group-2").style.display = "none";
                 
                 // 1. Hide the New Application form and display the table with the selected application contents
                 document.getElementById("prop-edit").setAttribute("style","display: none;");
                 document.getElementById("prop-table-full").setAttribute("style","");
+                
             }
             
+            /** 
+             * This function is called when the Add button is pressed and 
+             * it is responsible for adding the new Application entry
+             * to the array with the other applications. The new application
+             * entry is verified before added to the list.
+             */
             function addButtonPressed() {
                 
                 // 1. Create an empty application
@@ -446,14 +392,8 @@
                 
                 // 2. Retrieve the key values from the text fields
                 newApp = createApplicationFromFields();
-          
-                // TODO: Remove
-                console.log(newApp["ApplicationID"]);
-                console.log(newApp["Number of Available Implementations"]);
-                console.log(newApp["Minimum - Maximum Instructions Per App"]);
-                console.log(newApp["Minimum - Maximum VMs Per App"]);
                 
-                // 3. Check if the values are valid and add it to the list
+                // 3. Check if its values are valid and add it to the list
                 if (validNewApplication(newApp)) {
                     
                     // Add it to the list
@@ -467,107 +407,97 @@
                     updatePropertiesTable();
                     addTableRowHandler();
                     
-                    console.log(newApp)
-                    
-                    // 3. Display the table
+                    // 3. Display the table with the details of the newly added application
                     cancelButtonPressed();
                 } 
 
             }
             
             /*
-             * Add any checks here.
+             * This function is responsible for verifying whether the 
+             * details of the given applications are valid.
              */
             function validNewApplication(newApp) {
                 
-                // 1. Assume that the inputs will be correct
+                // 1. Assume that the details are correct
                 valid = true;
                 errorMessage = "";
                 
-                // 2. Check the inputs
+                // 2. Check the details
                 i = 1;
                 if (newApp["Accelerator support"].length != newApp["Available Implementations"].length) {
                     valid = false;
-                    //errorMessage += "1. The number of Accelerator support is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". Provide " + newApp["Available Implementations"].length + " elements at the Accelerator Support text field. \n";
                     i++;
                 }
                 
                 if (newApp["Rho for accelerator execution per Implementation"].length != newApp["Available Implementations"].length) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". Provide " + newApp["Available Implementations"].length + " elements at the Rho for accelerator execution per Implementation text field. \n";
                     i++;
                 }
                 
                 if (newApp["Type of Actual Utilization (vCPU,Memory,Network)"].length != 3) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". Provide 3 elements at the Type of Actual Utilization (vCPU,Memory,Network) text field. \n";
                     i++;
                 }
                 
                 if (newApp["Minimum - Maximum Instructions Per App"][0] > newApp["Minimum - Maximum Instructions Per App"][1]) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". The minimum instructions per app that you defined are larger than the maximum. \n";
                     i++;
                 }
                 
                 if (newApp["Minimum - Maximum VMs Per App"][0] > newApp["Minimum - Maximum VMs Per App"][1]) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". The minimum VMs per app that you defined are larger than the maximum. \n";
                     i++;
                 }
+                
                 if (newApp["Minimum - Maximum vCPUs Per VM"][0] > newApp["Minimum - Maximum vCPUs Per VM"][1]) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". The minimum vCPUs per VM that you defined are larger than the maximum. \n";
                     i++;
                 }
+                
                 if (newApp["Minimum - Maximum Memory Per VM"][0] > newApp["Minimum - Maximum Memory Per VM"][1]) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". The minimum memory per VM that you defined is larger than the maximum. \n";
                     i++;
                 }
+                
                 if (newApp["Minimum - Maximum Storage Per VM"][0] > newApp["Minimum - Maximum Storage Per VM"][1]) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". The minimum storage per VM that you defined is larger than the maximum. \n";
                     i++;
                 }
                 
                 if (newApp["Minimum - Maximum Network Per VM"][0] > newApp["Minimum - Maximum Network Per VM"][1]) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". The minimum network per VM that you defined is larger than the maximum. \n";
                     i++;
                 }
                 
                 if (newApp["Minimum - Maximum Actual vCPU Utilization"][0] > newApp["Minimum - Maximum Actual vCPU Utilization"][1]) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". The minimum actual vCPU utilization that you defined is larger than the maximum. \n";
                     i++;
                 }
                 
                 if (newApp["Minimum - Maximum Actual Memory Utilization"][0] > newApp["Minimum - Maximum Actual Memory Utilization"][1]) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". The minimum actual memory utilization that you defined is larger than the maximum. \n";
                     i++;
                 }
                 
                 if (newApp["Minimum - Maximum Actual Network Utilization"][0] > newApp["Minimum - Maximum Actual Network Utilization"][1]) {
                     valid = false;
-                    //errorMessage += "2. The number of Rho Elements is not equal to the number of the defined implemenatations \n";
                     errorMessage += i + ". The minimum actual network utilization that you defined is larger than the maximum. \n";
                     i++;
                 }
                 
-                // 3. Check if there was an error
+                // 3. Check if there was at least one error
                 if (!valid) {
                     alert(errorMessage);
                 }
@@ -634,10 +564,16 @@
                 return newApp;
             }
            
+            /**
+             * This function is responsible for deleting a selected application
+             * entry from the list with the applications.
+             */
             function deleteButtonPressed () {
                 
+                // Ensure that a specific entry is selected
                 if (selected != 0) {
                     
+                    // Ask confirmation from the user to avoid accidental deletion
                     var answer = confirm("This entry will be permanently deleted! Proceed with the action?");
                     
                     if (answer) {
@@ -664,15 +600,16 @@
                 }
             }
             
-            /* 
-             * It displays the form with the fields completed with the values of
-             * the selected application.
+            /** 
+             * This function is responsible for displaying the New/Edit Application form
+             * with its fields containing the details of the selected application entry.
              */
             function editButtonPressed() {
                 
+                // Ensure that an application entry is selected
                 if (selected != 0) {
                 
-                    // 0. Show the Save button
+                    // 0. Display the Save button
                     document.getElementById("button-group-2").style.display = "";
                     document.getElementById("save-button").style.display = "";
                     document.getElementById("add-button").style.display = "none";
@@ -686,9 +623,10 @@
                     //$("#prop-edit").fadeIn(2000);
 */
                 
-                    // 2. Add the info of the selected object to the fields of the form
+                    // 2. Get the selected application
                     var selObj = obj["Applications"][selected - 1];
                     
+                    // 3. Complete the text fields of the form with the details of the selected application
                     document.getElementById("ipa-min").value = selObj["Minimum - Maximum Instructions Per App"][0];
                     document.getElementById("ipa-max").value = selObj["Minimum - Maximum Instructions Per App"][1];
                     document.getElementById("vpa-min").value = selObj["Minimum - Maximum VMs Per App"][0];
@@ -717,6 +655,10 @@
                 }
             }
             
+            /**
+             * This function is responsible for saving the changes made to the selected 
+             * application entry.
+             */
             function saveButtonPressed() {
 
                 // 1. Create a new Application object
@@ -743,6 +685,10 @@
             }
         }
             
+            /**
+             * This function is responsible for exporting the final applications list
+             * in a JSON format.
+             */
             function exportJSONtoFile() {
                 var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
                 location.href = "data:application/octet-stream," + encodeURIComponent(json);
@@ -801,7 +747,8 @@
                      </tbody>
                   </table>
                </div>
-
+                
+       <!-- New and Edit Application Form -->
        <div class="row" id="prop-edit" style="display: none;" align="center">
         <!-- In order to shorten the fields, comment out the following tag and change the class attribute of all the following tags from col-xs-6 to col-xs-3 -->
         <!-- div class="col-xs-3 form-group"></div -->
@@ -983,7 +930,7 @@
                 
                 
                 <!-- TO BE REMOVED!!! -->
-                <textarea id="export-area" rows="20" cols="100"></textarea>
+                <!-- textarea id="export-area" rows="20" cols="100"></textarea -->
                  
             </div>
          </div>
