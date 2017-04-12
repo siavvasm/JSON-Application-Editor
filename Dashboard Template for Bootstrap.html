@@ -100,7 +100,36 @@
                 
                 <hr/>
                               
-        <script>      
+        <script>
+       
+            window.onload = function() { 
+                
+                // 1. Load the 
+                var reloaded = sessionStorage.getItem("reloaded");
+                var current_obj = sessionStorage.getItem("current_obj");
+
+                // 2. Check if the page is loaded after a refresh
+                if (reloaded == "true") {
+                    
+                    // 3. Read the previously stored contents
+                    obj = JSON.parse(current_obj);
+                    
+                    // 4. Refresh the view
+                    updateApplicationTable();
+                    addTableRowHandler();
+                }
+            }
+            
+            window.onbeforeunload = function() {
+                
+                // 1. Define that a page refresh has been performed
+                sessionStorage.setItem("reloaded", "true");
+                
+                // 2. Store the current work locally in the current session
+                var current_obj = JSON.stringify(obj);
+                sessionStorage.setItem("current_obj", current_obj);
+            }
+            
             // Initialize the global variables
             var obj = {"Number of Applications":0, "Minimum and Maximum Jobs Per Second":[], "Applications":[]}; 
             var selected = 0;
@@ -452,7 +481,7 @@ $("#app-table tr").click(function() {
                 
                 // 1. Create an empty application
                 var newApp = {};
-                
+                alert("HERE!!")
                 // 2. Retrieve the key values from the text fields
                 newApp = createApplicationFromFields();
                 
@@ -655,7 +684,7 @@ $("#app-table tr").click(function() {
                 // 3. Reset the checkboxes to false (in case that the Save button is not pressed)
                 // In case that the Save button is pressed, the checkboxes should be unchecked after the validation step
                 if (!save) {
-                    clearCheckboxes();
+                    //clearCheckboxes();
                 }
                 
                 
