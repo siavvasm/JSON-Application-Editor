@@ -361,10 +361,7 @@
                         
                         x = this.getElementsByTagName("td");
                         selected = parseInt(x[0].textContent); 
-                        alert("imported" + imported);
                         if(imported || document.getElementById("prop-table-full").style.display != "none"){
-                            // The button was clicked during inspection phase
-                            alert("Update Properties");
                             
                             // Check if it is the first time after the import
                             if(imported) {
@@ -627,6 +624,43 @@
                     i++;
                 }
 
+                for(var k=0; k < newApp["Accelerator support"].length; k++) {
+                    temp = newApp["Accelerator support"][k];
+                    //alert("temp: " + temp);
+                    if ((temp != 0) && (temp != 1)) {
+                        valid = false;
+                        errorMessage += i + ". The Accelerator Support fields accept only integer values between 0 and 1. \n";
+                        i++;
+                        break;
+                    }
+                }
+                
+               for(var k=0; k < newApp["Rho for accelerator execution per Implementation"].length; k++) {
+                    temp = newApp["Rho for accelerator execution per Implementation"][k];
+                    if ((temp < 0) || (temp > 1)) {
+                        valid = false;
+                        errorMessage += i + ". The 'Rho for accelerator execution per Implementation' fields accept only values that lie in the interval [0,1]. \n";
+                        i++;
+                        break;
+                    }
+                }
+                
+                // Check for NaNs
+                var editSection = document.getElementById("prop-edit");
+                var fields = editSection.getElementsByClassName("form-control");
+                
+                for (var k = 0; k < fields.length; k++) {
+                    if ((!fields[k].readOnly) && (fields[k].value == "")) {
+                        valid = false;
+                        errorMessage += i + ". Please complete all the fields of the form. \n";
+                        i++;
+                        break;
+                    }
+                }
+                
+
+               
+                
 
                
               /*     
