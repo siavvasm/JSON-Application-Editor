@@ -101,10 +101,14 @@
                 <hr/>
                               
         <script>
-       
+            
+            /*
+             *  This function is called whenever the page is loaded in order 
+             *  to check if there are data to restore.
+             */
             window.onload = function() { 
                 
-                // 1. Load the 
+                // 1. Load the locally stored data
                 var reloaded = sessionStorage.getItem("reloaded");
                 var current_obj = sessionStorage.getItem("current_obj");
 
@@ -121,17 +125,10 @@
 
             }
             
-/*                
-                $("#export-file-button").on("click", function () {
-                    console.log("Lober!!!!!!!");
-                    obj["Number of Applications"] = obj["Applications"].length;
-                    var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
-                    console.log(json);
-                    $(this).attr("href", "data:application/octet-stream," + encodeURIComponent(json)).attr("download", "AppData.png");
-                    console.log(4);
-                });
-*/
-            
+            /* 
+             * This function is called before reloading the page in order
+             * to store the previous work made by the user.
+             */ 
             window.onbeforeunload = function() {
                 
                 // 1. Define that a page refresh has been performed
@@ -162,9 +159,8 @@
                 
                 // 1. Get the JSON string
                 var jsonInput = document.getElementById("import-field").value;
-                imported = true;
+                imported = true; // State that importation is attempted by the user
                 
-                // TODO: Validate against a schema ...
                 if (jsonInput.includes('{') && jsonInput.includes('}')) {
                     
                     // 2. Parse the content of the JSON string
@@ -173,7 +169,6 @@
                     // 3. Update the tables 
                     updateApplicationTable();
                     addTableRowHandler();
-                    
                     
                 } else {
                     alert("Please provide a valid json string before clicking the Parse button!");
@@ -195,7 +190,7 @@
                 loadFileContent();
                 
                 // Update the tables
-                imported = true;
+                imported = true; // State that importation is attempted by the user
                 updateApplicationTable();   
                 addTableRowHandler();
                 
@@ -217,7 +212,7 @@
              * file that contains the desired JSON.
              */
             function loadFileContent(){
-                  //alert("LOADING!!!")
+
                   // 1. Get the name of the desired file and update the value of the Import field.
                   var fileToLoad = document.getElementById("fileToLoad").files[0];
                   document.getElementById("import-field").value = fileToLoad["name"];
@@ -235,16 +230,14 @@
                       console.log(textFromFileLoaded);
 
                       // 2. Parse the JSON string into a JavaScript object
-                      
-                      obj  = JSON.parse(textFromFileLoaded);
+                      obj = JSON.parse(textFromFileLoaded);
                       console.log(obj);
                       
                       // 3. Update everything 
                       updateApplicationTable();
                       addTableRowHandler();
                       
-                      // 4. Clear the list with the files
-                      //document.getElementById("fileToLoad").files.splice(0,1);
+                      // 4. Clear the list with the files (to allow re-importation of the same file)
                       document.getElementById('fileToLoad').value = "";
                       
                   };
@@ -270,7 +263,6 @@
              * to export the final list of applications as a JSON String.
              */
             function exportJSON() {
-                
                 
                 if (getJobsPerSecAndValidate()){
                     
@@ -321,10 +313,6 @@
                     
                     table.appendChild(tr);
                 }
-                
-
-
-
             }
             
            
@@ -345,11 +333,12 @@
 
                     rows[i].onclick = function () {
 
-                        // Reset the colour of the table rows
+                        // 1. Reset the color of the table rows
                         for (var i = 0, len = rows.length; i < len; i++) {
                             rows[i].className = "";
                         }
                         
+                        // 2. Highlight the selected row
                         var sel = this.className;
                         
                         if (sel == "") {
@@ -358,12 +347,12 @@
                             this.className = "";
                         }
                      
-                        
+                        // 3. Update the Properties Table or the Edit Form with the details of the selected App
                         x = this.getElementsByTagName("td");
                         selected = parseInt(x[0].textContent); 
                         if(imported || document.getElementById("prop-table-full").style.display != "none"){
                             
-                            // Check if it is the first time after the import
+                            // Check if it is the first time after the importation
                             if(imported) {
                                 // Make the properties table visible and reset the imported flag.
                                 document.getElementById("prop-table-full").style.display = "";
@@ -427,9 +416,7 @@
                     i++;
                 }
             }
-            
-
-       
+             
             /**
              * This function is responsible for displaying an empty New/Edit Application
              * form.
@@ -449,11 +436,6 @@
                 clearTextFields();
                 clearCheckboxes();
                 resetFields();
-                //document.getElementById("rho-imp1").readOnly = false;
-/*
-                $("#prop-table").slideUp(2000);
-                $("#prop-edit").slideDown(2000);
-*/
             }
             
             /**
@@ -502,7 +484,7 @@
                 
                 // 1. Create an empty application
                 var newApp = {};
-                //alert("HERE!!")
+                
                 // 2. Retrieve the key values from the text fields
                 newApp = createApplicationFromFields();
                 
@@ -658,52 +640,6 @@
                     }
                 }
                 
-
-               
-                
-
-               
-              /*     
-                // Check if there is at least one NaN value
-                for (var value in newApp) {
-                    if (isNaN(newApp[value])) {
-                        alert(newApp[value])
-                        valid = false;
-                        errorMessage += i + ". Please ensure that you have completed all the fields of the form. \n";
-                        i++;
-                        break;
-                    } 
-                }
-                
-                
-                if ((newApp["Accelerator Support"] != 0) || (newApp["Accelerator Support"] != 1)) {
-                    valid = false;
-                    errorMessage += i + ". The Accelerator Support field accepts only the values 0 and 1. \n";
-                    i++;
-                } 
-
-               
-                for (var k=0, length = newApp["Accelerator Support"].length; k < length; k++) {
-                    if ((newApp["Accelerator Support"][k] != 0) || (newApp["Accelerator Support"][k] != 1)) {
-                    alert("PROBLEM!!!!");
-                    valid = false;
-                    errorMessage += i + ". The Accelerator Support field accepts only the values 0 and 1. \n";
-                    i++;
-                    break;
-                    }
-                }
-
-                    
-                    
-                }
-                if ((newApp["Accelerator Support"] != 0) || (newApp["Accelerator Support"] != 1)) {
-                    valid = false;
-                    errorMessage += i + ". The Accelerator Support field accepts only the values 0 and 1. \n";
-                    i++;
-                }
-                
-                */
-                
                 // 3. Check if there was at least one error
                 if (!valid) {
                     alert(errorMessage);
@@ -714,6 +650,11 @@
                 
             }
             
+            /*
+             * This function is responsible for retrieving the IDs of the 
+             * implementations that were selected by the user through the
+             * available checkboxes.
+             */
             function retrieveAvailImpl() {
                 
                 // 1. Initialize the necessary variables 
@@ -721,35 +662,24 @@
                 var k = 0;
                 var list = document.getElementById("av-im").getElementsByTagName("input");
                 
-                //alert(list.length);
-                //alert(document.getElementById("av-im").innerHTML)
-                
                 // 2. Get the selected implementations and add them to a list
                 for (var i=0, length=list.length; i < length ; i++) {
-                    //alert(list[i].checked);
                     if (list[i].checked) {
                         availImpl[k] = i + 1;
                         k++;
-                        //alert(list[i].value)
                     }
                 }
                 
-                // 3. Reset the checkboxes to false (in case that the Save button is not pressed)
-                // In case that the Save button is pressed, the checkboxes should be unchecked after the validation step
-                if (!save) {
-                    //clearCheckboxes();
-                }
-                
-                
-                //alert(availImpl);
-                
-                // 4. Return the list with the selected implementations
+                // 3. Return the list with the selected implementations
                 return(availImpl);
-
             }
             
+            /*
+             * This function is responsible for unchecking the checkboxes
+             * of the Edit form that correspond to the Available Implementations  
+             * of the Cloudlightning simulator. 
+             */
             function clearCheckboxes() {
-                //alert("Clear Checkboxes!!");
                 var list = document.getElementById("av-im").getElementsByTagName("input");
                 for (var i=0, length = list.length; i < length ; i++) {
                     list[i].checked = false;
@@ -765,73 +695,45 @@
                 // 1. Create an empty application
                 var newApp = {};
                 
-                // 2. Add the values from the fields
+                /*
+                 * 2. Add the values from the fields
+                 */
+                
+                // Set the ID of the newly added application
                 newApp["ApplicationID"] = obj["Applications"].length + 1;
                 
-                /*
-                var availImpl = document.getElementById("avail-impl").value;
-                availImpl = availImpl.split(',');
-                for (var i = 0; i < availImpl.length; i++) {
-                    availImpl[i] = parseInt(availImpl[i]);
-                }
-                */
-                
+                // Define the selected implementations and their number
                 var availImpl = retrieveAvailImpl();
-                //alert(availImpl);
-                
                 newApp["Number of Available Implementations"] = availImpl.length;
                 newApp["Available Implementations"] = availImpl;
+                
+                // Set the min and max values of the appropriate fields
                 newApp["Minimum - Maximum Instructions Per App"] = [parseFloat(document.getElementById("ipa-min").value), parseFloat(document.getElementById("ipa-max").value)];
                 newApp["Minimum - Maximum VMs Per App"] = [parseInt(document.getElementById("vpa-min").value), parseInt(document.getElementById("vpa-max").value)];
                 newApp["Minimum - Maximum vCPUs Per VM"] = [parseInt(document.getElementById("cpu-min").value), parseInt(document.getElementById("cpu-max").value)];
                 newApp["Minimum - Maximum Memory Per VM"] = [parseInt(document.getElementById("mpv-min").value), parseInt(document.getElementById("mpv-max").value)];
                 newApp["Minimum - Maximum Storage Per VM"] = [parseFloat(document.getElementById("spv-min").value), parseFloat(document.getElementById("spv-max").value)];
                 newApp["Minimum - Maximum Network Per VM"] = [parseFloat(document.getElementById("npv-min").value), parseFloat(document.getElementById("npv-max").value)];
+                newApp["Minimum - Maximum Actual vCPU Utilization"] = [parseFloat(document.getElementById("acu-min").value), parseFloat(document.getElementById("acu-max").value)];
+                newApp["Minimum - Maximum Actual Memory Utilization"] = [parseFloat(document.getElementById("amu-min").value), parseFloat(document.getElementById("amu-max").value)];
+                newApp["Minimum - Maximum Actual Network Utilization"] = [parseFloat(document.getElementById("anu-min").value), parseFloat(document.getElementById("anu-max").value)];
                 
-                
-                
-                //TODO: Change
-/*
-                var typeActUtil = document.getElementById("type-util").value;
-                typeActUtil = typeActUtil.split(',');
-                for (var i = 0; i < 3; i++) {
-                    typeActUtil[i] = parseInt(typeActUtil[i]);
-                }
-*/
+                // Type of Actual Utilization (vCPU, Memory, Network)
                 var typeActUtil = [];
                 typeActUtil[0] = parseFloat(document.getElementById("vcpu-util").value);
                 typeActUtil[1] = parseFloat(document.getElementById("mem-util").value);
                 typeActUtil[2] = parseFloat(document.getElementById("net-util").value);
                 newApp["Type of Actual Utilization (vCPU,Memory,Network)"] = typeActUtil;
-                //alert(typeActUtil);
-                //alert("**********************************");
-                
-                newApp["Minimum - Maximum Actual vCPU Utilization"] = [parseFloat(document.getElementById("acu-min").value), parseFloat(document.getElementById("acu-max").value)];
-                newApp["Minimum - Maximum Actual Memory Utilization"] = [parseFloat(document.getElementById("amu-min").value), parseFloat(document.getElementById("amu-max").value)];
-                newApp["Minimum - Maximum Actual Network Utilization"] = [parseFloat(document.getElementById("anu-min").value), parseFloat(document.getElementById("anu-max").value)];
-                
-                //TODO: Change
-/*
-                var accSupport = document.getElementById("acc-sup").value;
-                accSupport = accSupport.split(',');
-                for (var i = 0; i < accSupport.length; i++) {
-                    accSupport[i] = parseInt(accSupport[i]);
-                }
-*/              
+                          
+                // Accelerator Support
                 var accSupport = [];
                 for(var i = 0; i < availImpl.length; i++) {
                     accSupport[i] = parseFloat(document.getElementById("acc-sup-imp" + availImpl[i]).value);
                     //alert(accSupport[i]);
                 }
                 newApp["Accelerator support"] = accSupport;
-/*
-                var rho = document.getElementById("rho-exec").value;
-                rho = rho.split(',');
-                for (var i = 0; i < rho.length; i++) {
-                    rho[i] = parseFloat(rho[i]);
-                }
-*/
                 
+                // Rho for accelerator execution per Implementation
                 var rho = [];
                 for(var i = 0; i < availImpl.length; i++) {
                     rho[i] = parseFloat(document.getElementById("rho-imp" + availImpl[i]).value);
@@ -893,18 +795,13 @@
                     document.getElementById("save-button").style.display = "";
                     document.getElementById("add-button").style.display = "none";
                     
-                    // 0. Clear the checkboxes
+                    // 0. Clear the checkboxes and reset the Accelerator Support and Rho fields
                     clearCheckboxes();
                     resetFields();
                     
                     // 1. Hide the Properties Table and present the form
                     document.getElementById("prop-table-full").setAttribute("style","display: none;");
                     document.getElementById("prop-edit").setAttribute("style","");
-                    
-/*
-                    //$("#prop-table").fadeOut(2000);
-                    //$("#prop-edit").fadeIn(2000);
-*/
                 
                     // 2. Get the selected application
                     var selObj = obj["Applications"][selected - 1];
@@ -914,9 +811,7 @@
                     document.getElementById("ipa-max").value = selObj["Minimum - Maximum Instructions Per App"][1];
                     document.getElementById("vpa-min").value = selObj["Minimum - Maximum VMs Per App"][0];
                     document.getElementById("vpa-max").value = selObj["Minimum - Maximum VMs Per App"][1];
-                    //document.getElementById("avail-impl").value = selObj["Available Implementations"].join(',');
                     
-                    //TODO:
                     // Check the appropriate checkboxes based on the selected implementations
                     for (var i=0, length = selObj["Available Implementations"].length; i < length; i++) {
                        document.getElementById("" + selObj["Available Implementations"][i]).checked = true;
@@ -925,7 +820,7 @@
                     // Enable the appropriate Acc Sup and RhO fields based on the selected implementations
                     refreshFields();
                     
-                    //alert(selObj["Available Implementations"].length);
+                    // Complete the values of the min-max text fields with the appropriate values
                     document.getElementById("cpu-min").value = selObj["Minimum - Maximum vCPUs Per VM"][0];
                     document.getElementById("cpu-max").value = selObj["Minimum - Maximum vCPUs Per VM"][1];
                     document.getElementById("mpv-min").value = selObj["Minimum - Maximum Memory Per VM"][0];
@@ -947,15 +842,11 @@
                         document.getElementById("rho-imp" + selObj["Available Implementations"][i]).value = selObj["Rho for accelerator execution per Implementation"][i];
                     }
                     
+                    // Update the values of the 'Type of Actual Utilization (vCPU,Memory,Network)' fields
                     document.getElementById("vcpu-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"][0];
                     document.getElementById("mem-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"][1];
                     document.getElementById("net-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"][2];
                     
-                    // Previous solution ...
-                    //document.getElementById("rho-exec").value = selObj["Rho for accelerator execution per Implementation"];
-                    //document.getElementById("acc-sup").value = selObj["Accelerator support"].join(',');
-                    //document.getElementById("type-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"].join(',');
-   
                 } else {
                     alert("Please select an application first!");
                 }
@@ -972,7 +863,7 @@
                 // 1. Create a new Application object
                 var newApp = {}
                 
-                // 2. Retrieve the values from the fields
+                // 2. Retrieve the values of the Application from the fields and set its ID
                 newApp = createApplicationFromFields();
                 newApp["ApplicationID"] = obj["Applications"][selected - 1]["ApplicationID"];
                 
@@ -987,6 +878,7 @@
                     updatePropertiesTable();
                     addTableRowHandler();
                     
+                    // TODO: Remove this print
                     console.log(newApp)
                     
                     // Highlight the selected app
@@ -1002,7 +894,10 @@
             }
         }
             
-            
+            /*
+             * This function is responsible for defining the min and max Jobs per Second
+             * of the overall simulation.
+             */
             function getJobsPerSecAndValidate() {
                 
                 // 1. Get the values from the fields
@@ -1026,19 +921,10 @@
             }
             
             /**
-             * This function is responsible for exporting the final applications list
+             * This functions are responsible for exporting the final applications list
              * in a JSON format.
              */
-            function exportJSONtoFile() {
-                if(getJobsPerSecAndValidate()) {
-                    obj["Number of Applications"] = obj["Applications"].length;
-                    var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
-                   location.href = "data:application/octet-stream;," + encodeURIComponent(json);
 
-                    console.log(location.href);
-                }
-            }
-            
             function exportJSONtoFile2() {
                 document.getElementById("download-anchor").click();
             }
@@ -1049,11 +935,17 @@
                    var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
                    
                    document.getElementById("download-anchor").setAttribute("href", "data:application/octet-stream;," + encodeURIComponent(json));
-                   console.log(document.getElementById("download-anchor"));
-                                        
+                    
+                   // TODO: Remove this print
+                   console.log(document.getElementById("download-anchor"));                 
                 }
             }
             
+            /*
+             * This function is responsible for enabling the corresponding fields 
+             * of the 'Accelerator Support' and 'Rho' properties based on the 
+             * checkboxes selected by the user.
+             */
             function refreshFields() {
                 
                 // 0. Disable all the fields
@@ -1061,7 +953,6 @@
                 
                 // 1. Retrieve the selected implementations
                 availImpl = retrieveAvailImpl();
-                //alert(availImpl);
                 
                 // 2. Refresh the text fields
                 for(var i = 0; i < availImpl.length; i++) {
@@ -1078,18 +969,28 @@
                 }
             }
             
+            /*
+             * This function is responsible for disabling all the fields of the
+             * 'Accelerator Support' and 'Rho' properties.
+             */
             function disableFields() {
                 
+                // Clear the value of the fields that correspond to the first implementation
                 document.getElementById("acc-sup-imp1").value = "";
                 document.getElementById("rho-imp1").value = "";
                 
-                //TODO: Make this more generic - use the number of the checkboxes
+                // Disable all the fields 
+                // TODO: Make this more generic
                 for(var i = 1; i < 5; i++) {
                     document.getElementById("acc-sup-imp" + i).readOnly = true;
                     document.getElementById("rho-imp" + i).readOnly = true;
                 }
             }
             
+            /*
+             * This function is responsible for reseting the values of the fields
+             * that correspond to the 'Accelerator Support' and 'Rho' properties.
+             */
             function resetFields() {
                 //TODO: Make this more generic - use the number of the checkboxes
                 for(var i = 1; i < 5; i++) {
@@ -1153,37 +1054,22 @@
                   </table>
                </div>
                 
-       <!-- New and Edit Application Form -->
-<div class="row" id="prop-edit" style="display: none;" align="center">
-        <!-- In order to shorten the fields, comment out the following tag and change the class attribute of all the following tags from col-xs-6 to col-xs-3 -->
-        <!-- div class="col-xs-3 form-group"></div -->
-        <!-- div class="col-xs-6 form-group">
-            <label>Application Name</label>
-            <input class="form-control" class="form-control" placeholder="Application Name" style="text-align:center;" type="text" id="app-name"/>
-        </div --> 
+    <!-- New and Edit Application Form -->
+    <div class="row" id="prop-edit" style="display: none;" align="center">
+
         <div class="col-xs-12 form-group" id="av-im">
             <label>Available Implementations</label>
-            <!--input class="form-control" type="text" placeholder="Available Implementations" style="text-align:center;" id="avail-impl"/-->
-
             </br>
-<!-- div class="selectBox" onclick="showCheckboxes()">
-  <select>
-    <option>Select Implementations</option>
-  </select>
-  <div class="overSelect"></div>
-</div -->
 
-
-  <label for="one" style="margin: 10px">
-    <input type="checkbox" id="1" value="1" onclick="refreshFields()"/>CPU</label>
-  <label for="two" style="margin: 10px">
-    <input type="checkbox" id="2" value="2" style="margin: 10px 2px;" onclick="refreshFields()"/>CPU+GPU</label>
-  <label for="three" style="margin: 10px">
-    <input type="checkbox" id="3" value="3" onclick="refreshFields()"/>CPU+DFE</label>
-  <label for="four" style="margin: 10px">
-    <input type="checkbox" id="4" value="4" onclick="refreshFields()"/>CPU+MIC</label>
-
-
+        <!-- Available Implementation Checkboxes -->
+        <label for="one" style="margin: 10px">
+         <input type="checkbox" id="1" value="1" onclick="refreshFields()"/>CPU</label>
+        <label for="two" style="margin: 10px">
+         <input type="checkbox" id="2" value="2" style="margin: 10px 2px;" onclick="refreshFields()"/>CPU+GPU</label>
+        <label for="three" style="margin: 10px">
+         <input type="checkbox" id="3" value="3" onclick="refreshFields()"/>CPU+DFE</label>
+        <label for="four" style="margin: 10px">
+         <input type="checkbox" id="4" value="4" onclick="refreshFields()"/>CPU+MIC</label>
             
         </div>
            
@@ -1391,57 +1277,47 @@
             </div>
         </div>
         
-</div>
+    </div>
 
-        <div id="button-group-2" align="right" id="prop-edit-buttons" style="display:none">
-            <button id="save-button" class="btn btn-default" onclick="saveButtonPressed()">Save</button>
-            <button id="add-button" class="btn btn-default" onclick="addButtonPressed()">Add</button>
-            <button id="cancel-button" class="btn btn-default" onclick="cancelButtonPressed()">Cancel</button>
-        </div>
+    <!-- Save, Add and Cancel Buttons -->
+    <div id="button-group-2" align="right" id="prop-edit-buttons" style="display:none">
+        <button id="save-button" class="btn btn-default" onclick="saveButtonPressed()">Save</button>
+        <button id="add-button" class="btn btn-default" onclick="addButtonPressed()">Add</button>
+        <button id="cancel-button" class="btn btn-default" onclick="cancelButtonPressed()">Cancel</button>
+    </div>
              
 <br/><br/>
-<!-- Definition of General Properties Section -->       
+             
+<!-- Section 4: General Properties Section -->       
 <h2 class="sub-header" align="left">General Properties</h2>
     <br>
         <label  style="font-family: Calibri; font-size:20px"> Please define the minimum and maximum jobs per second: </label>
     <br>        
-<!--
-    <br>
-        <div class="col-xs-12 form-group">
-        <div class="row">
-          
-                <input type="text" id="jobs-min" class="form-control"  placeholder= "min" width="100px" vspace="0" style="max-width:200px;margin:auto;margin-top:10px;text-align:center;">
-          
-                <input type="text" id="jobs-max" class="form-control"  placeholder= "max" width="100px" vspace="0" style="max-width:200px;margin:auto;margin-top:10px;text-align:center;"> 
-            
-        </div>
-        </div>
-    <br>
--->
-        <br/>  
-        <div class="col-xs-12 form-group">
-            <div class="row" align="center">
-                <div class="col-xs-3 col-sm-3" style="visible:false">
-                    <input class="form-control" placeholder="min" style="text-align:center;" type="hidden" id="temp"/>
-                </div>
-                <div class="col-xs-3 col-sm-3">
-                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="jobs-min"/>
-                </div>
-                <div class="col-xs-3 col-sm-3">
-                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="jobs-max"/>
-                </div>
+    <br/>  
+             
+    <div class="col-xs-12 form-group">
+        <div class="row" align="center">
+            <div class="col-xs-3 col-sm-3" style="visible:false">
+                <input class="form-control" placeholder="min" style="text-align:center;" type="hidden" id="temp"/>
+            </div>
+            <div class="col-xs-3 col-sm-3">
+                <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="jobs-min"/>
+            </div>
+            <div class="col-xs-3 col-sm-3">
+                <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="jobs-max"/>
             </div>
         </div>
-             
-             
-       <br/><br/><br/>
+    </div>            
+<br/><br/><br/>
+
+<!-- Section 5: Export JSON section -->
 <h2 class="sub-header" align="left">Export</h2>          
                <!-- Section 4 -->
-               <!--label style="font-family: Calibri; font-size:40px" >TQI</label-->
                 <br>
-                <label  style="font-family: Calibri; font-size:20px"> Click the button below to retrieve the desired JSON string: </label>
+                    <label  style="font-family: Calibri; font-size:20px"> Click the button below to retrieve the desired JSON string: </label>
                 <br>
-                 <input type="text" id="export-field" class="form-control"  placeholder= "JSON String Output" width="500px" vspace="0" style="max-width:500px;margin:auto;margin-top:10px;text-align:center;">
+             
+                <input type="text" id="export-field" class="form-control"  placeholder= "JSON String Output" width="500px" vspace="0" style="max-width:500px;margin:auto;margin-top:10px;text-align:center;">
                 <br>
                 <button id="export-button" class="btn btn-default" onclick="exportJSON()">Export Json</button>
                 
@@ -1452,21 +1328,16 @@
                 <br><br>
                 <hr/>
              
-        <script>
-
-        </script>
-                
-                
-                <!-- TO BE REMOVED!!! -->
-                <!-- textarea id="export-area" rows="20" cols="100"></textarea -->
-                 
             </div>
          </div>
       </div>
        
         <div class="container-fluid" align="center">
        </div>
-      <!-- Bootstrap core JavaScript================================================== --><!-- Placed at the end of the document so the pages load faster --><script src="./Dashboard Template for Bootstrap_files/jquery.min.js.download"></script><script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script><script src="./Dashboard Template for Bootstrap_files/bootstrap.min.js.download"></script><!-- Just to make our placeholder images work. Don't actually copy the next line! --><script src="./Dashboard Template for Bootstrap_files/holder.min.js.download"></script><!-- IE10 viewport hack for Surface/desktop Windows 8 bug --><script src="./Dashboard Template for Bootstrap_files/ie10-viewport-bug-workaround.js.download"></script>
+    
+    <!-- Bootstrap core JavaScript================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./Dashboard Template for Bootstrap_files/jquery.min.js.download"></script><script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script><script src="./Dashboard Template for Bootstrap_files/bootstrap.min.js.download"></script><!-- Just to make our placeholder images work. Don't actually copy the next line! --><script src="./Dashboard Template for Bootstrap_files/holder.min.js.download"></script><!-- IE10 viewport hack for Surface/desktop Windows 8 bug --><script src="./Dashboard Template for Bootstrap_files/ie10-viewport-bug-workaround.js.download"></script>
       <div id="fb-root" class=" fb_reset">
          <div style="position: absolute; top: -10000px; height: 0px; width: 0px;">
             <div></div>
