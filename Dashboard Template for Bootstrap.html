@@ -118,7 +118,19 @@
                     updateApplicationTable();
                     addTableRowHandler();
                 }
+
             }
+            
+/*                
+                $("#export-file-button").on("click", function () {
+                    console.log("Lober!!!!!!!");
+                    obj["Number of Applications"] = obj["Applications"].length;
+                    var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
+                    console.log(json);
+                    $(this).attr("href", "data:application/octet-stream," + encodeURIComponent(json)).attr("download", "AppData.png");
+                    console.log(4);
+                });
+*/
             
             window.onbeforeunload = function() {
                 
@@ -134,6 +146,7 @@
             var obj = {"Number of Applications":0, "Minimum and Maximum Jobs Per Second":[], "Applications":[]}; 
             var selected = 0;
             var save = false;
+            var imported = false;
             
             var schemaStr = ```{"title":"Application set","Number of Applications":{"type":"number"},"Minimum and Maximum Jobs Per Second":{"type":"array"},"Applications":{"type":"array","items": {"title":"Application","type":"object","properties": {"ApplicationID": {"type": "number"},"Number of Available Implementations": {"type": "number"},"Available Implementations": {"type": "number"},"Minimum - Maximum Instructions Per App": {"type": "array"},"Minimum - Maximum VMs Per App":{"type":"array"},"Minimum - Maximum vCPUs Per VM":{"type":"array"},"Minimum - Maximum Memory Per VM": {"type": "array"},"Minimum - Maximum Storage Per VM": {"type": "array"},"Minimum - Maximum Network Per VM": {"type": "array"},"Type of Actual Utilization (vCPU,Memory,Network)": {"type": "array"},"Minimum - Maximum Actual vCPU Utilization": {"type": "array"},"Minimum - Maximum Actual Memory Utilization": {"type": "array"},"Minimum - Maximum Actual Network Utilization": {"type": "array"},"Accelerator support": {"type": "array"},"Rho for accelerator execution per Implementation": {"type": "array"}}}}}```;
             
@@ -143,8 +156,13 @@
              */
             function parseJSON() {
                 
+                // 0. Initialization
+                selected = 0;
+                hidePropertiesViewAndEdit();
+                
                 // 1. Get the JSON string
                 var jsonInput = document.getElementById("import-field").value;
+                imported = true;
                 
                 // TODO: Validate against a schema ...
                 if (jsonInput.includes('{') && jsonInput.includes('}')) {
@@ -155,6 +173,7 @@
                     // 3. Update the tables 
                     updateApplicationTable();
                     addTableRowHandler();
+                    
                     
                 } else {
                     alert("Please provide a valid json string before clicking the Parse button!");
@@ -168,13 +187,28 @@
              */
             function importJSONFile() {
                 
+                // 0. Initialization
+                selected = 0;
+                hidePropertiesViewAndEdit();
+                
                 // Import the file content as text
                 loadFileContent();
                 
                 // Update the tables
+                imported = true;
                 updateApplicationTable();   
                 addTableRowHandler();
+                
 
+            }
+            
+            function hidePropertiesViewAndEdit() {
+                document.getElementById("prop-table-full").setAttribute("style","display: none;");
+                document.getElementById("prop-edit").setAttribute("style","display: none;");
+                document.getElementById("button-group-2").style.display = "none";
+                document.getElementById("save-button").style.display = "none";
+                document.getElementById("add-button").style.display = "none";
+                document.getElementById("cancel-button").style.display = "";
             }
             
 
@@ -310,24 +344,7 @@
                 for (var i = 0, len = rows.length; i < len; i++) {
 
                     rows[i].onclick = function () {
-                    /*
-                        var sel = this.className;
-                        alert(sel);
-                        if (sel == ""){
-                            alert("Empty class name!");
-                        } else {
-                            alert("Non empty class name!")
-                        }
-                        this.className = "highlight";
-                        sel = this.className;
-                        alert(sel);
-                        if (sel == "highlight"){
-                            alert("Contains highlight class!");
-                        } else {
-                            alert("Does not contain highlight class!")
-                        }
-                     */
-/**/
+
                         // Reset the colour of the table rows
                         for (var i = 0, len = rows.length; i < len; i++) {
                             rows[i].className = "";
@@ -340,22 +357,25 @@
                         } else {
                             this.className = "";
                         }
-
-                      
-/* 
-$("#app-table tr").click(function() {
-    var sel = $(this).hasClass("highlight");
-    $("#app-table tr").removeClass("highlight");
-    if(!sel)
-            $(this).addClass("highlight");
-});
-*/                          
+                     
                         
                         x = this.getElementsByTagName("td");
                         selected = parseInt(x[0].textContent); 
-                        if(document.getElementById("prop-table-full").style.display != "none"){
+                        alert("imported" + imported);
+                        if(imported || document.getElementById("prop-table-full").style.display != "none"){
                             // The button was clicked during inspection phase
+                            alert("Update Properties");
+                            
+                            // Check if it is the first time after the import
+                            if(imported) {
+                                // Make the properties table visible and reset the imported flag.
+                                document.getElementById("prop-table-full").style.display = "";
+                                imported = false;
+                            }
+                            
+                            // Update the contents of the Properties Table.
                             updatePropertiesTable();
+                            
                         } else {
                             // The row was clicked during edit phase
                             editButtonPressed();
@@ -410,6 +430,8 @@ $("#app-table tr").click(function() {
                     i++;
                 }
             }
+            
+
        
             /**
              * This function is responsible for displaying an empty New/Edit Application
@@ -429,6 +451,8 @@ $("#app-table tr").click(function() {
                 // 2. Clear all the text fields
                 clearTextFields();
                 clearCheckboxes();
+                resetFields();
+                //document.getElementById("rho-imp1").readOnly = false;
 /*
                 $("#prop-table").slideUp(2000);
                 $("#prop-edit").slideDown(2000);
@@ -481,7 +505,7 @@ $("#app-table tr").click(function() {
                 
                 // 1. Create an empty application
                 var newApp = {};
-                alert("HERE!!")
+                //alert("HERE!!")
                 // 2. Retrieve the key values from the text fields
                 newApp = createApplicationFromFields();
                 
@@ -602,12 +626,7 @@ $("#app-table tr").click(function() {
                     errorMessage += i + ". The minimum actual network utilization that you defined is larger than the maximum. \n";
                     i++;
                 }
-                
 
-                
-
-               
-                
 
                
               /*     
@@ -688,7 +707,7 @@ $("#app-table tr").click(function() {
                 }
                 
                 
-                alert(availImpl);
+                //alert(availImpl);
                 
                 // 4. Return the list with the selected implementations
                 return(availImpl);
@@ -696,7 +715,7 @@ $("#app-table tr").click(function() {
             }
             
             function clearCheckboxes() {
-                alert("Clear Checkboxes!!");
+                //alert("Clear Checkboxes!!");
                 var list = document.getElementById("av-im").getElementsByTagName("input");
                 for (var i=0, length = list.length; i < length ; i++) {
                     list[i].checked = false;
@@ -724,7 +743,7 @@ $("#app-table tr").click(function() {
                 */
                 
                 var availImpl = retrieveAvailImpl();
-                alert(availImpl);
+                //alert(availImpl);
                 
                 newApp["Number of Available Implementations"] = availImpl.length;
                 newApp["Available Implementations"] = availImpl;
@@ -735,29 +754,53 @@ $("#app-table tr").click(function() {
                 newApp["Minimum - Maximum Storage Per VM"] = [parseFloat(document.getElementById("spv-min").value), parseFloat(document.getElementById("spv-max").value)];
                 newApp["Minimum - Maximum Network Per VM"] = [parseFloat(document.getElementById("npv-min").value), parseFloat(document.getElementById("npv-max").value)];
                 
+                
+                
+                //TODO: Change
+/*
                 var typeActUtil = document.getElementById("type-util").value;
                 typeActUtil = typeActUtil.split(',');
                 for (var i = 0; i < 3; i++) {
                     typeActUtil[i] = parseInt(typeActUtil[i]);
                 }
-                
+*/
+                var typeActUtil = [];
+                typeActUtil[0] = parseFloat(document.getElementById("vcpu-util").value);
+                typeActUtil[1] = parseFloat(document.getElementById("mem-util").value);
+                typeActUtil[2] = parseFloat(document.getElementById("net-util").value);
                 newApp["Type of Actual Utilization (vCPU,Memory,Network)"] = typeActUtil;
+                //alert(typeActUtil);
+                //alert("**********************************");
                 
                 newApp["Minimum - Maximum Actual vCPU Utilization"] = [parseFloat(document.getElementById("acu-min").value), parseFloat(document.getElementById("acu-max").value)];
                 newApp["Minimum - Maximum Actual Memory Utilization"] = [parseFloat(document.getElementById("amu-min").value), parseFloat(document.getElementById("amu-max").value)];
                 newApp["Minimum - Maximum Actual Network Utilization"] = [parseFloat(document.getElementById("anu-min").value), parseFloat(document.getElementById("anu-max").value)];
                 
+                //TODO: Change
+/*
                 var accSupport = document.getElementById("acc-sup").value;
                 accSupport = accSupport.split(',');
                 for (var i = 0; i < accSupport.length; i++) {
                     accSupport[i] = parseInt(accSupport[i]);
                 }
+*/              
+                var accSupport = [];
+                for(var i = 0; i < availImpl.length; i++) {
+                    accSupport[i] = parseFloat(document.getElementById("acc-sup-imp" + availImpl[i]).value);
+                    //alert(accSupport[i]);
+                }
                 newApp["Accelerator support"] = accSupport;
-                
+/*
                 var rho = document.getElementById("rho-exec").value;
                 rho = rho.split(',');
                 for (var i = 0; i < rho.length; i++) {
                     rho[i] = parseFloat(rho[i]);
+                }
+*/
+                
+                var rho = [];
+                for(var i = 0; i < availImpl.length; i++) {
+                    rho[i] = parseFloat(document.getElementById("rho-imp" + availImpl[i]).value);
                 }
                 newApp["Rho for accelerator execution per Implementation"] = rho;
                 
@@ -818,6 +861,7 @@ $("#app-table tr").click(function() {
                     
                     // 0. Clear the checkboxes
                     clearCheckboxes();
+                    resetFields();
                     
                     // 1. Hide the Properties Table and present the form
                     document.getElementById("prop-table-full").setAttribute("style","display: none;");
@@ -837,11 +881,17 @@ $("#app-table tr").click(function() {
                     document.getElementById("vpa-min").value = selObj["Minimum - Maximum VMs Per App"][0];
                     document.getElementById("vpa-max").value = selObj["Minimum - Maximum VMs Per App"][1];
                     //document.getElementById("avail-impl").value = selObj["Available Implementations"].join(',');
+                    
                     //TODO:
+                    // Check the appropriate checkboxes based on the selected implementations
                     for (var i=0, length = selObj["Available Implementations"].length; i < length; i++) {
                        document.getElementById("" + selObj["Available Implementations"][i]).checked = true;
                     }
-                    alert(selObj["Available Implementations"].length);
+                    
+                    // Enable the appropriate Acc Sup and RhO fields based on the selected implementations
+                    refreshFields();
+                    
+                    //alert(selObj["Available Implementations"].length);
                     document.getElementById("cpu-min").value = selObj["Minimum - Maximum vCPUs Per VM"][0];
                     document.getElementById("cpu-max").value = selObj["Minimum - Maximum vCPUs Per VM"][1];
                     document.getElementById("mpv-min").value = selObj["Minimum - Maximum Memory Per VM"][0];
@@ -856,9 +906,21 @@ $("#app-table tr").click(function() {
                     document.getElementById("amu-max").value = selObj["Minimum - Maximum Actual Memory Utilization"][1];
                     document.getElementById("anu-min").value = selObj["Minimum - Maximum Actual Network Utilization"][0];
                     document.getElementById("anu-max").value = selObj["Minimum - Maximum Actual Network Utilization"][1];
-                    document.getElementById("rho-exec").value = selObj["Rho for accelerator execution per Implementation"];
-                    document.getElementById("acc-sup").value = selObj["Accelerator support"].join(',');
-                    document.getElementById("type-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"].join(',');
+                    
+                    // Update the values of Accelerator Support and Rho fields
+                    for (var i = 0; i < selObj["Available Implementations"].length; i++) {
+                        document.getElementById("acc-sup-imp" + selObj["Available Implementations"][i]).value = selObj["Accelerator support"][i];
+                        document.getElementById("rho-imp" + selObj["Available Implementations"][i]).value = selObj["Rho for accelerator execution per Implementation"][i];
+                    }
+                    
+                    document.getElementById("vcpu-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"][0];
+                    document.getElementById("mem-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"][1];
+                    document.getElementById("net-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"][2];
+                    
+                    // Previous solution ...
+                    //document.getElementById("rho-exec").value = selObj["Rho for accelerator execution per Implementation"];
+                    //document.getElementById("acc-sup").value = selObj["Accelerator support"].join(',');
+                    //document.getElementById("type-util").value = selObj["Type of Actual Utilization (vCPU,Memory,Network)"].join(',');
    
                 } else {
                     alert("Please select an application first!");
@@ -937,8 +999,70 @@ $("#app-table tr").click(function() {
                 if(getJobsPerSecAndValidate()) {
                     obj["Number of Applications"] = obj["Applications"].length;
                     var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
-                    location.href = "data:application/octet-stream," + encodeURIComponent(json);
+                   location.href = "data:application/octet-stream;," + encodeURIComponent(json);
+
                     console.log(location.href);
+                }
+            }
+            
+            function exportJSONtoFile2() {
+                document.getElementById("download-anchor").click();
+            }
+            
+            function exportJSONFile() {
+                if(getJobsPerSecAndValidate()) {
+                   obj["Number of Applications"] = obj["Applications"].length;
+                   var json = neatJSON(obj, {'sort':false, 'wrap':40, 'aligned':true, 'around_colon':1 });
+                   
+                   document.getElementById("download-anchor").setAttribute("href", "data:application/octet-stream;," + encodeURIComponent(json));
+                   console.log(document.getElementById("download-anchor"));
+                                        
+                }
+            }
+            
+            function refreshFields() {
+                
+                // 0. Disable all the fields
+                disableFields();
+                
+                // 1. Retrieve the selected implementations
+                availImpl = retrieveAvailImpl();
+                //alert(availImpl);
+                
+                // 2. Refresh the text fields
+                for(var i = 0; i < availImpl.length; i++) {
+                    switch(availImpl[i]){
+                        case 1:
+                            document.getElementById("acc-sup-imp1").value = 0;
+                            document.getElementById("rho-imp1").value = 0;
+                            break;
+                        default:
+                            document.getElementById("acc-sup-imp" + availImpl[i]).readOnly = false;
+                            document.getElementById("rho-imp" + availImpl[i]).readOnly = false;
+                            break;
+                    }
+                }
+            }
+            
+            function disableFields() {
+                
+                document.getElementById("acc-sup-imp1").value = "";
+                document.getElementById("rho-imp1").value = "";
+                
+                //TODO: Make this more generic - use the number of the checkboxes
+                for(var i = 1; i < 5; i++) {
+                    document.getElementById("acc-sup-imp" + i).readOnly = true;
+                    document.getElementById("rho-imp" + i).readOnly = true;
+                }
+            }
+            
+            function resetFields() {
+                //TODO: Make this more generic - use the number of the checkboxes
+                for(var i = 1; i < 5; i++) {
+                    document.getElementById("acc-sup-imp" + i).readOnly = true;
+                    document.getElementById("rho-imp" + i).readOnly = true;
+                    document.getElementById("acc-sup-imp" + i).value = "";
+                    document.getElementById("rho-imp" + i).value = "";
                 }
             }
         
@@ -996,7 +1120,7 @@ $("#app-table tr").click(function() {
                </div>
                 
        <!-- New and Edit Application Form -->
-       <div class="row" id="prop-edit" style="display: none;" align="center">
+<div class="row" id="prop-edit" style="display: none;" align="center">
         <!-- In order to shorten the fields, comment out the following tag and change the class attribute of all the following tags from col-xs-6 to col-xs-3 -->
         <!-- div class="col-xs-3 form-group"></div -->
         <!-- div class="col-xs-6 form-group">
@@ -1017,13 +1141,13 @@ $("#app-table tr").click(function() {
 
 
   <label for="one" style="margin: 10px">
-    <input type="checkbox" id="1" value="1" />CPU</label>
+    <input type="checkbox" id="1" value="1" onclick="refreshFields()"/>CPU</label>
   <label for="two" style="margin: 10px">
-    <input type="checkbox" id="2" value="2" style="margin: 10px 2px;" />CPU+GPU</label>
+    <input type="checkbox" id="2" value="2" style="margin: 10px 2px;" onclick="refreshFields()"/>CPU+GPU</label>
   <label for="three" style="margin: 10px">
-    <input type="checkbox" id="3" value="3"/>CPU+DFE</label>
+    <input type="checkbox" id="3" value="3" onclick="refreshFields()"/>CPU+DFE</label>
   <label for="four" style="margin: 10px">
-    <input type="checkbox" id="4" value="4"/>CPU+MIC</label>
+    <input type="checkbox" id="4" value="4" onclick="refreshFields()"/>CPU+MIC</label>
 
 
             
@@ -1119,27 +1243,27 @@ $("#app-table tr").click(function() {
             </div>
         </div>
 
-        <div class="col-xs-6 form-group">
+        <!--div class="col-xs-6 form-group">
             <label>Type of Actual Utilization (vCPU,Memory,Network)</label>
             <input class="form-control" type="text" placeholder="Actual Utilization" style="text-align:center;" id="type-util"/>
-        </div>
+        </div-->
                 
-        <!-- div class="col-xs-6 form-group">
+        <div class="col-xs-6 form-group">
             <div class="row">
                 <label class="col-xs-12">Type of Actual Utilization (vCPU,Memory,Network)</label>
             </div>
             <div class="row">
                 <div class="col-xs-4 col-sm-4">
-                    <input class="form-control" placeholder="vCPU" style="text-align:center;" type="text" id="acn"/>
+                    <input class="form-control" placeholder="vCPU" style="text-align:center;" type="text" id="vcpu-util"/>
                 </div>
                 <div class="col-xs-4 col-sm-4">
-                    <input class="form-control" placeholder="Memory" style="text-align:center;" type="text" id="acx"/>
+                    <input class="form-control" placeholder="Memory" style="text-align:center;" type="text" id="mem-util"/>
                 </div>
                 <div class="col-xs-4 col-sm-4">
-                    <input class="form-control" placeholder="Network" style="text-align:center;" type="text" id="acax"/>
+                    <input class="form-control" placeholder="Network" style="text-align:center;" type="text" id="net-util"/>
                 </div>
             </div>
-        </div-->
+        </div>
 
         <div class="col-xs-6 form-group">
             <div class="row">
@@ -1183,16 +1307,57 @@ $("#app-table tr").click(function() {
             </div>
         </div>
            
-        <div class="col-xs-6 form-group">
+        <!--div class="col-xs-6 form-group">
             <label>Accelerator Support</label>
             <input class="form-control" type="text" placeholder="Accelerator Support" style="text-align:center;" id="acc-sup"/>
+        </div-->
+                
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">Accelerator Support</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-4 col-sm-3">
+                    <input class="form-control" placeholder="CPU" style="text-align:center;" type="text" id="acc-sup-imp1" readonly/>
+                </div>
+                <div class="col-xs-4 col-sm-3">
+                    <input class="form-control" placeholder="CPU+GPU" style="text-align:center;" type="text" id="acc-sup-imp2" readonly/>
+                </div>
+                <div class="col-xs-4 col-sm-3">
+                    <input class="form-control" placeholder="CPU+DFE" style="text-align:center;" type="text" id="acc-sup-imp3" readonly/>
+                </div>
+                <div class="col-xs-4 col-sm-3">
+                    <input class="form-control" placeholder="CPU+MIC" style="text-align:center;" type="text" id="acc-sup-imp4" readonly/>
+                </div>
+            </div>
         </div>
            
-        <div class="col-xs-6 form-group">
+        <!--div class="col-xs-6 form-group">
             <label>Rho for accelerator execution per Implementation</label>
             <input class="form-control" type="text" placeholder="Rho" style="text-align:center;" id="rho-exec"/>
+        </div-->
+         
+        <div class="col-xs-6 form-group">
+            <div class="row">
+                <label class="col-xs-12">Rho for accelerator execution per Implementation</label>
+            </div>
+            <div class="row">
+                <div class="col-xs-4 col-sm-3">
+                    <input class="form-control" placeholder="CPU" style="text-align:center;" type="text" id="rho-imp1" readonly/>
+                </div>
+                <div class="col-xs-4 col-sm-3">
+                    <input class="form-control" placeholder="CPU+GPU" style="text-align:center;" type="text" id="rho-imp2" readonly/>
+                </div>
+                <div class="col-xs-4 col-sm-3">
+                    <input class="form-control" placeholder="CPU+DFE" style="text-align:center;" type="text" id="rho-imp3" readonly/>
+                </div>
+                <div class="col-xs-4 col-sm-3">
+                    <input class="form-control" placeholder="CPU+MIC" style="text-align:center;" type="text" id="rho-imp4" readonly/>
+                </div>
+            </div>
         </div>
-    </div>
+        
+</div>
 
         <div id="button-group-2" align="right" id="prop-edit-buttons" style="display:none">
             <button id="save-button" class="btn btn-default" onclick="saveButtonPressed()">Save</button>
@@ -1245,9 +1410,17 @@ $("#app-table tr").click(function() {
                  <input type="text" id="export-field" class="form-control"  placeholder= "JSON String Output" width="500px" vspace="0" style="max-width:500px;margin:auto;margin-top:10px;text-align:center;">
                 <br>
                 <button id="export-button" class="btn btn-default" onclick="exportJSON()">Export Json</button>
-                <button id="export-file-button" class="btn btn-default" onclick="exportJSONtoFile()">Export Json to File</button>
+                
+                <!-- Trick for exporting a file with a desired name and in the desired format -->
+                <button id="export-file-button" class="btn btn-default" onclick="exportJSONtoFile2()" download="file.txt">Export Json to File</button>
+                <a id="download-anchor" onclick="exportJSONFile()" download="AppData.File" style="display:none;">Hello!</a> 
+                
                 <br><br>
                 <hr/>
+             
+        <script>
+
+        </script>
                 
                 
                 <!-- TO BE REMOVED!!! -->
