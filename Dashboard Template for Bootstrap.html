@@ -60,7 +60,7 @@
    <body style="cursor: initial;">
       <nav class="navbar navbar-inverse navbar-fixed-top" style="background-color:#555">
          <div class="container-fluid">
-            <div class="navbar-header"><button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a class="navbar-brand" href="http://83.212.101.169:8080/OnlineProjectEvaluator/index.html" style="color:#eeeeee">Cloudlightning</a></div>
+            <div class="navbar-header"><button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a class="navbar-brand" href="http://cloudlightning.eu/" style="color:#eeeeee">Cloudlightning</a></div>
             <div id="navbar" class="navbar-collapse collapse">
                <ul class="nav navbar-nav navbar-right">
                   <li><a href="http://cloudlightning.eu/">Home</a></li>
@@ -74,7 +74,7 @@
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-1 main" align="center">
                
                <!-- Section 1 -->
-               <h1 class="page-header">Application JSON Generator</h1>
+               <h1 class="page-header">Cloudlightning - Application JSON Editor</h1>
                <!--label style="font-family: Calibri; font-size:40px" >TQI</label-->
                 <br>
                 <label style="font-family: Calibri; font-size:20px"> Please provide the JSON string or click the import button to load the JSON file that you would like to parse its contnet: </label>
@@ -962,7 +962,8 @@
                             document.getElementById("rho-imp1").value = 0;
                             break;
                         default:
-                            document.getElementById("acc-sup-imp" + availImpl[i]).readOnly = false;
+                            // Automatically set the values of the accelerator support fields to 1
+                            document.getElementById("acc-sup-imp" + availImpl[i]).value = 1;
                             document.getElementById("rho-imp" + availImpl[i]).readOnly = false;
                             break;
                     }
@@ -976,7 +977,10 @@
             function disableFields() {
                 
                 // Clear the value of the fields that correspond to the first implementation
-                document.getElementById("acc-sup-imp1").value = "";
+                for (var i = 1; i < 5; i++) {
+                    document.getElementById("acc-sup-imp" + i).value = "";
+                }
+                
                 document.getElementById("rho-imp1").value = "";
                 
                 // Disable all the fields 
@@ -1098,10 +1102,10 @@
             </div>
             <div class="row">
                 <div class="col-xs-12 col-sm-6">
-                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="vpa-min"/>
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="number" min="0" id="vpa-min"/>
                 </div>
                 <div class="col-xs-12 col-sm-6">
-                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="vpa-max"/>
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="number" min="0" id="vpa-max"/>
                 </div>
             </div>
         </div>
@@ -1113,10 +1117,10 @@
             </div>
             <div class="row">
                 <div class="col-xs-12 col-sm-6">
-                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="cpu-min"/>
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="number" min="0" id="cpu-min"/>
                 </div>
                 <div class="col-xs-12 col-sm-6">
-                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="cpu-max"/>
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="number" min="0" id="cpu-max"/>
                 </div>
             </div>
         </div>
@@ -1127,10 +1131,10 @@
             </div>
             <div class="row">
                 <div class="col-xs-12 col-sm-6">
-                    <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="mpv-min"/>
+                    <input class="form-control" placeholder="min" style="text-align:center;" type="number" min="0" id="mpv-min"/>
                 </div>
                 <div class="col-xs-12 col-sm-6">
-                    <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="mpv-max"/>
+                    <input class="form-control" placeholder="max" style="text-align:center;" type="number" min="0" id="mpv-max"/>
                 </div>
             </div>
         </div>
@@ -1232,11 +1236,11 @@
             <input class="form-control" type="text" placeholder="Accelerator Support" style="text-align:center;" id="acc-sup"/>
         </div-->
                 
-        <div class="col-xs-6 form-group">
+        <div class="col-xs-6 form-group" style="display:none;">
             <div class="row">
                 <label class="col-xs-12">Accelerator Support</label>
             </div>
-            <div class="row">
+            <div class="row" id="acc-sup">
                 <div class="col-xs-4 col-sm-3">
                     <input class="form-control" placeholder="CPU" style="text-align:center;" type="text" id="acc-sup-imp1" readonly/>
                 </div>
@@ -1301,10 +1305,10 @@
                 <input class="form-control" placeholder="min" style="text-align:center;" type="hidden" id="temp"/>
             </div>
             <div class="col-xs-3 col-sm-3">
-                <input class="form-control" placeholder="min" style="text-align:center;" type="text" id="jobs-min"/>
+                <input class="form-control" placeholder="min" style="text-align:center;" type="number" min="0" id="jobs-min"/>
             </div>
             <div class="col-xs-3 col-sm-3">
-                <input class="form-control" placeholder="max" style="text-align:center;" type="text" id="jobs-max"/>
+                <input class="form-control" placeholder="max" style="text-align:center;" type="number" min="0" id="jobs-max"/>
             </div>
         </div>
     </div>            
@@ -1323,7 +1327,7 @@
                 
                 <!-- Trick for exporting a file with a desired name and in the desired format -->
                 <button id="export-file-button" class="btn btn-default" onclick="exportJSONtoFile2()" download="file.txt">Export Json to File</button>
-                <a id="download-anchor" onclick="exportJSONFile()" download="AppData.File" style="display:none;">Hello!</a> 
+                <a id="download-anchor" onclick="exportJSONFile()" download="AppData.json" style="display:none;">Hello!</a> 
                 
                 <br><br>
                 <hr/>
