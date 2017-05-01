@@ -1187,7 +1187,7 @@
                     return false;
                 }
                 
-                if (min <= max) {
+                if (parseInt(min) <= parseInt(max)) {
                     obj["Minimum and Maximum Jobs Per Second"][0] = parseInt(min);
                     obj["Minimum and Maximum Jobs Per Second"][1] = parseInt(max);
                     return true;
@@ -1203,7 +1203,9 @@
              */
 
             function exportJSONtoFile2() {
-                document.getElementById("download-anchor").click();
+                if(getJobsPerSecAndValidate()) {
+                    document.getElementById("download-anchor").click();
+                }
             }
             
             function exportJSONFile() {
