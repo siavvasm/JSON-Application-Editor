@@ -1,0 +1,60 @@
+{
+  "Number of Applications":3,
+  "Minimum and Maximum Jobs Per Second":[1,4],
+
+"Applications":
+[
+  {	
+	"ApplicationID": 1,
+	"Number of Available Implementations": 3,
+  "Available Implementations": [1,2,3],
+  "Minimum - Maximum Instructions Per App":[1386228336.48,5544913345.92],
+  "Minimum - Maximum VMs Per App": [1,16],
+  "Minimum - Maximum vCPUs Per VM": [4,8],
+  "Minimum - Maximum Memory Per VM": [4,8],
+  "Minimum - Maximum Storage Per VM":[0.02,0.04],
+  "Minimum - Maximum Network Per VM":[0.01,0.02],
+  "Type of Actual Utilization (vCPU,Memory,Network)":[1,1,1],
+  "Minimum - Maximum Actual vCPU Utilization":[1,1],
+  "Minimum - Maximum Actual Memory Utilization":[1,1],
+  "Minimum - Maximum Actual Network Utilization":[1,1],
+  "Accelerator support":[0,1,1],
+  "Rho for accelerator execution per Implementation":[0,0.7,0.5]
+  },
+  {
+	"ApplicationID": 2,
+	"Number of Available Implementations": 3,
+  "Available Implementations": [1,2,3],
+  "Minimum - Maximum Instructions Per App":[462076112.16,2772456672.96],
+  "Minimum - Maximum VMs Per App":[1,8],
+  "Minimum - Maximum vCPUs Per VM":[8,16],
+  "Minimum - Maximum Memory Per VM":[4,8],
+  "Minimum - Maximum Storage Per VM":[0.01,0.02],
+  "Minimum - Maximum Network Per VM":[0.002,0.004],
+  "Type of Actual Utilization (vCPU,Memory,Network)":[1,1,1],
+  "Minimum - Maximum Actual vCPU Utilization":[1,1],
+  "Minimum - Maximum Actual Memory Utilization":[1,1],
+  "Minimum - Maximum Actual Network Utilization":[1,1],
+  "Accelerator support":[0,1,1],
+  "Rho for accelerator execution per Implementation":[0,0.8,0.9]
+  },
+  {
+  "ApplicationID": 3,
+  "Number of Available Implementations":2,
+  "Available Implementations":[1,4],
+  "Minimum - Maximum Instructions Per App":[693114168.24,4158685009.44],
+  "Minimum - Maximum VMs Per App":[1,4],
+  "Minimum - Maximum vCPUs Per VM":[4,8],
+  "Minimum - Maximum Memory Per VM":[4,8],
+  "Minimum - Maximum Storage Per VM":[0.04,0.08],
+  "Minimum - Maximum Network Per VM":[0.01,0.02],
+  "Type of Actual Utilization (vCPU,Memory,Network)":[1,1,1],
+  "Minimum - Maximum Actual vCPU Utilization":[1,1],
+  "Minimum - Maximum Actual Memory Utilization":[1,1],
+  "Minimum - Maximum Actual Network Utilization":[1,1],
+  "Accelerator support":[0,1],
+  "Rho for accelerator execution per Implementation":[0,0.9]
+  }
+]
+
+}
